@@ -22,15 +22,6 @@
           libxkbcommon
           wayland
         ];
-
-        package = pkgs.rustPlatform.buildRustPackage {
-          inherit version;
-          pname = name;
-
-          src = ./.;
-          cargoLock.lockFile = ./Cargo.lock;
-          nativeBuildInputs = deps;
-        };
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [

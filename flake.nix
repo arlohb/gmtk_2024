@@ -34,11 +34,6 @@
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath deps;
         };
-
-        packages = rec {
-          "${name}" = package;
-          default = package;
-        };
       }
     );
 }

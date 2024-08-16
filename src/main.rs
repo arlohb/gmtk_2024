@@ -5,7 +5,7 @@ pub use velocity::*;
 mod camera;
 pub use camera::*;
 
-use bevy::prelude::*;
+use bevy::{asset::AssetMetaCheck, prelude::*};
 
 fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
     let circle = assets.load("Circle.png");
@@ -33,8 +33,14 @@ fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (create_player, setup_camera))
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            // Trunk doesn't return 404 if a file isn't there,
+            // so the meta check will assume it should be there,
+            // which it isn't
+            meta_check: AssetMetaCheck::Never,
+            ..Default::default()
+        }))
+        .add_systems(Startup, (create_player, setup_camera, create_background))
         .add_systems(FixedUpdate, movement_system)
         .add_systems(
             FixedPostUpdate,

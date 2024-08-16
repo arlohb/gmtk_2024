@@ -2,6 +2,8 @@ mod movement;
 pub use movement::*;
 mod velocity;
 pub use velocity::*;
+mod camera;
+pub use camera::*;
 
 use bevy::prelude::*;
 
@@ -29,28 +31,14 @@ fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
     ));
 }
 
-fn create_camera(mut cmds: Commands, mut clear_color: ResMut<ClearColor>) {
-    *clear_color = ClearColor(Color::BLACK);
-
-    cmds.spawn(Camera2dBundle {
-        camera: Camera {
-            hdr: true,
-            ..Default::default()
-        },
-        projection: OrthographicProjection {
-            scale: 1.,
-            ..Default::default()
-        },
-        transform: Transform::from_xyz(0., 0., 10.),
-        ..Default::default()
-    });
-}
-
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (create_player, create_camera))
+        .add_systems(Startup, (create_player, setup_camera))
         .add_systems(FixedUpdate, movement_system)
-        .add_systems(FixedPostUpdate, apply_velocity)
+        .add_systems(
+            FixedPostUpdate,
+            (apply_velocity, follow_player.after(apply_velocity)),
+        )
         .run();
 }

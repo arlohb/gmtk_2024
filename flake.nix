@@ -3,11 +3,16 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, rust-overlay }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages."${system}";
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ (import rust-overlay) ];
+        };
 
         name = "name";
         version = "0.0.1";
@@ -25,11 +30,10 @@
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            cargo
-            rustc
+            (pkgs.rust-bin.fromRustupToolchainFile ./toolchain.toml)
             rust-analyzer
-            clippy
-            rustfmt
+
+            trunk
           ] ++ deps;
 
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath deps;

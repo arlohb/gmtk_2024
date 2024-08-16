@@ -5,7 +5,13 @@ pub use velocity::*;
 mod camera;
 pub use camera::*;
 
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::{
+    asset::AssetMetaCheck,
+    prelude::*,
+    render::texture::{
+        ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor,
+    },
+};
 
 fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
     let circle = assets.load("Circle.png");
@@ -29,6 +35,31 @@ fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
             drag: 0.04,
         },
     ));
+}
+
+fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
+    let texture = assets.load_with_settings("Grid.png", |s| {
+        *s = ImageLoaderSettings {
+            sampler: ImageSampler::Descriptor(ImageSamplerDescriptor {
+                address_mode_u: ImageAddressMode::Repeat,
+                address_mode_v: ImageAddressMode::Repeat,
+                ..Default::default()
+            }),
+            ..Default::default()
+        }
+    });
+
+    let size = 2048.;
+
+    cmds.spawn(SpriteBundle {
+        sprite: Sprite {
+            color: Color::linear_rgb(0.1, 0.1, 0.1),
+            rect: Some(Rect::new(0., 0., size, size)),
+            ..Default::default()
+        },
+        texture,
+        ..Default::default()
+    });
 }
 
 fn main() {

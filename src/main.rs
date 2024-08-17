@@ -60,6 +60,7 @@ fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
             ..Default::default()
         },
         texture,
+        transform: Transform::from_xyz(0., 0., -1.),
         ..Default::default()
     });
 }

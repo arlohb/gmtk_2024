@@ -28,9 +28,9 @@ pub struct Molecule {
 fn create_polygon(points: usize) -> Vec<Vec2> {
     let start_point = match points {
         1 => Vec2::new(0., 0.),
-        2 => Vec2::new(-36., 0.),
-        4 => Vec2::new(48., 48.),
-        _ => Vec2::new(0., points as f32 * 16.),
+        2 => Vec2::new(-56., 0.),
+        4 => Vec2::new(64., 64.),
+        _ => Vec2::new(0., points as f32 * 24.),
     };
 
     (0..points)

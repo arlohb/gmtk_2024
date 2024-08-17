@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::health::Health;
+use crate::health::{Health, HealthSprite};
 
 #[derive(Component)]
 pub struct Atom;
@@ -32,12 +32,37 @@ impl ElementInfo {
             texture: assets.load(self.image_path()),
             ..Default::default()
         };
+
+        let health = (
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::linear_rgb(1., 1., 1.),
+                    custom_size: Some(Vec2::new(128., 128.)),
+                    rect: Some(Rect::new(0., 0., 32., 32.)),
+                    ..Default::default()
+                },
+                texture: assets.load("Health.png"),
+                ..Default::default()
+            },
+            HealthSprite,
+        );
+
         match self {
-            ElementInfo::Hydrogen => {
-                parent.spawn((sprite_bundle, Atom, Health::new(100.), Hydrogen))
-            }
-            ElementInfo::Iron => parent.spawn((sprite_bundle, Atom, Health::new(0.), Iron)),
-            ElementInfo::Uranium => parent.spawn((sprite_bundle, Atom, Health::new(100.), Uranium)),
+            ElementInfo::Hydrogen => parent
+                .spawn((sprite_bundle, Atom, Health::new(100.), Hydrogen))
+                .with_children(|parent| {
+                    parent.spawn(health);
+                }),
+            ElementInfo::Iron => parent
+                .spawn((sprite_bundle, Atom, Health::new(0.), Iron))
+                .with_children(|parent| {
+                    parent.spawn(health);
+                }),
+            ElementInfo::Uranium => parent
+                .spawn((sprite_bundle, Atom, Health::new(100.), Uranium))
+                .with_children(|parent| {
+                    parent.spawn(health);
+                }),
         };
     }
 }

@@ -84,6 +84,7 @@ fn main() {
         .add_plugins(player::plugin)
         .add_plugins(molecule::plugin)
         .add_plugins(enemy::plugin)
+        .add_plugins(health::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

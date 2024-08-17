@@ -76,6 +76,7 @@ fn player_shoot(
     }
 }
 
+// TODO, Need to despawn the bullet
 #[derive(Event)]
 pub struct BulletHit(pub Entity, pub Bullet);
 
@@ -90,6 +91,8 @@ pub fn bullet_hit_system(
     players: Query<Entity, With<Player>>,
     mut healths: Query<(&mut Health, &Parent), With<Atom>>,
 ) {
+    let damage = 100. / 8.;
+
     for BulletHit(atom, bullet) in events.read() {
         let Ok((mut health, parent)) = healths.get_mut(*atom) else {
             return;
@@ -98,8 +101,8 @@ pub fn bullet_hit_system(
         let is_player_atom = players.contains(**parent);
 
         match (is_player_atom, bullet) {
-            (true, Bullet::FromEnemy) => health.health -= 100.,
-            (false, Bullet::FromPlayer) => health.health -= 100.,
+            (true, Bullet::FromEnemy) => health.health -= damage,
+            (false, Bullet::FromPlayer) => health.health -= damage,
             _ => (),
         };
     }

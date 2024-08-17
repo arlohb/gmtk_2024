@@ -15,7 +15,7 @@ pub fn setup_camera(mut cmds: Commands, mut clear_color: ResMut<ClearColor>) {
                 ..Default::default()
             },
             projection: OrthographicProjection {
-                scale: 1.,
+                scale: 1.5,
                 ..Default::default()
             },
             transform: Transform::from_xyz(0., 0., 10.),

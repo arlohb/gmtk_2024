@@ -24,7 +24,13 @@ impl ElementInfo {
         }
     }
 
-    pub fn build(&self, parent: &mut ChildBuilder, assets: &AssetServer, offset: Vec2) {
+    pub fn build(
+        &self,
+        parent: &mut ChildBuilder,
+        assets: &AssetServer,
+        offset: Vec2,
+        is_player: bool,
+    ) {
         let sprite_bundle = SpriteBundle {
             sprite: Sprite {
                 color: Color::linear_rgb(1., 1., 1.),
@@ -44,7 +50,11 @@ impl ElementInfo {
                     rect: Some(Rect::new(0., 0., 32., 32.)),
                     ..Default::default()
                 },
-                texture: assets.load("Health.png"),
+                texture: assets.load(if is_player {
+                    "Health.png"
+                } else {
+                    "HealthEnemy.png"
+                }),
                 ..Default::default()
             },
             HealthSprite,

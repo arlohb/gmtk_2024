@@ -5,6 +5,7 @@ use crate::{
     enemy::Enemy,
     energy::Energy,
     health::Health,
+    Player,
 };
 
 #[derive(Event)]
@@ -55,14 +56,14 @@ pub fn build_molecules_system(
     mut events: EventReader<BuildMolecule>,
     assets: Res<AssetServer>,
     mut cmds: Commands,
-    mut molecules: Query<(Entity, &mut Molecule, Option<&Children>)>,
+    mut molecules: Query<(Entity, &mut Molecule, Option<&Player>, Option<&Children>)>,
     mut child_transforms: Query<&mut Transform, With<Parent>>,
 ) {
     for event in events.read() {
         match *event {
             BuildMolecule::Create { target } => {
                 cmds.entity(target).with_children(|parent| {
-                    let Ok((_, molecule, _)) = molecules.get(target) else {
+                    let Ok((_, molecule, player, _)) = molecules.get(target) else {
                         return;
                     };
 
@@ -73,12 +74,13 @@ pub fn build_molecules_system(
                         .iter()
                         .enumerate()
                         .for_each(|(i, element)| {
-                            element.build(parent, &assets, offsets[i]);
+                            element.build(parent, &assets, offsets[i], player.is_some());
                         });
                 });
             }
             BuildMolecule::Add { target, element } => {
-                let Ok((_, mut molecule, Some(old_children))) = molecules.get_mut(target) else {
+                let Ok((_, mut molecule, player, Some(old_children))) = molecules.get_mut(target)
+                else {
                     return;
                 };
 
@@ -94,11 +96,11 @@ pub fn build_molecules_system(
                 }
 
                 cmds.entity(target).with_children(|parent| {
-                    element.build(parent, &assets, *offsets.last().unwrap());
+                    element.build(parent, &assets, *offsets.last().unwrap(), player.is_some());
                 });
             }
             BuildMolecule::RemoveAtom { target, atom } => {
-                let Ok((entity, mut molecule, Some(old_children))) = molecules.get_mut(target)
+                let Ok((entity, mut molecule, _, Some(old_children))) = molecules.get_mut(target)
                 else {
                     return;
                 };

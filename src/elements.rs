@@ -46,6 +46,19 @@ pub struct Iron;
 #[derive(Component)]
 pub struct Uranium;
 
+fn create_polygon(points: usize) -> Vec<Vec2> {
+    let start_point = match points {
+        1 => Vec2::new(0., 0.),
+        2 => Vec2::new(36., 0.),
+        4 => Vec2::new(48., 48.),
+        _ => Vec2::new(0., points as f32 * 16.),
+    };
+
+    (0..points)
+        .map(|i| Rot2::degrees(i as f32 * 360. / points as f32) * start_point)
+        .collect()
+}
+
 pub fn build_elements(
     assets: Res<AssetServer>,
     players: Query<(Entity, &Player, Option<&Children>), With<Player>>,
@@ -56,14 +69,15 @@ pub fn build_elements(
     cmds.entity(player_id)
         .clear_children()
         .with_children(|parent| {
+            let offsets = create_polygon(player.elements.len());
+
             player.elements.iter().enumerate().for_each(|(i, element)| {
-                element.build(parent, &assets, Vec2::new(72., 0.) * i as f32)
+                element.build(parent, &assets, offsets[i]);
             });
         });
 
     if let Some(old_children) = old_children {
         old_children.iter().for_each(|child| {
-            // return;
             cmds.entity(*child).despawn();
         });
     }

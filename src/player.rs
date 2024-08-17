@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    elements::{build_elements, ElementInfo},
+    elements::{BuildElements, ElementInfo},
     Movement, Velocity,
 };
 
@@ -10,7 +10,7 @@ pub struct Player {
     pub elements: Vec<ElementInfo>,
 }
 
-pub fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
+pub fn create_player(mut cmds: Commands, build_elements: Res<BuildElements>) {
     cmds.spawn((
         SpatialBundle::default(),
         Movement {
@@ -24,12 +24,8 @@ pub fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
         Player {
             elements: vec![ElementInfo::Uranium],
         },
-    ))
-    .with_children(|parent| {
-        for child in build_elements(&[ElementInfo::Uranium], &assets) {
-            parent.spawn(child);
-        }
-    });
+    ));
+    cmds.run_system_with_input(build_elements.0, vec![ElementInfo::Uranium]);
 }
 
 pub fn plugin(app: &mut App) {

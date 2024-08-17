@@ -18,13 +18,14 @@ impl ElementInfo {
         }
     }
 
-    pub fn build(&self, parent: &mut ChildBuilder, assets: &AssetServer) {
+    pub fn build(&self, parent: &mut ChildBuilder, assets: &AssetServer, offset: Vec2) {
         let sprite_bundle = SpriteBundle {
             sprite: Sprite {
                 color: Color::linear_rgb(1., 1., 1.),
                 custom_size: Some(Vec2::new(64., 64.)),
                 ..Default::default()
             },
+            transform: Transform::from_xyz(offset.x, offset.y, 0.),
             texture: assets.load(self.image_path()),
             ..Default::default()
         };
@@ -46,30 +47,30 @@ pub struct Iron;
 pub struct Uranium;
 
 pub fn build_elements(
-    In(elements): In<Vec<ElementInfo>>,
     assets: Res<AssetServer>,
-    players: Query<(Entity, Option<&Children>), With<Player>>,
+    players: Query<(Entity, &Player, Option<&Children>), With<Player>>,
     mut cmds: Commands,
 ) {
-    let (player, old_children) = players.single();
+    let (player_id, player, old_children) = players.single();
 
-    if let Some(old_children) = old_children {
-        old_children
-            .iter()
-            .for_each(|child| cmds.entity(*child).despawn());
-    }
-
-    cmds.entity(player)
+    cmds.entity(player_id)
         .clear_children()
         .with_children(|parent| {
-            elements
-                .iter()
-                .for_each(|element| element.build(parent, &assets));
+            player.elements.iter().enumerate().for_each(|(i, element)| {
+                element.build(parent, &assets, Vec2::new(72., 0.) * i as f32)
+            });
         });
+
+    if let Some(old_children) = old_children {
+        old_children.iter().for_each(|child| {
+            // return;
+            cmds.entity(*child).despawn();
+        });
+    }
 }
 
 #[derive(Resource)]
-pub struct BuildElements(pub SystemId<Vec<ElementInfo>>);
+pub struct BuildElements(pub SystemId);
 
 impl FromWorld for BuildElements {
     fn from_world(world: &mut World) -> Self {

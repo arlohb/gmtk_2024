@@ -25,7 +25,7 @@ pub fn create_player(mut cmds: Commands, build_elements: Res<BuildElements>) {
             elements: vec![ElementInfo::Uranium],
         },
     ));
-    cmds.run_system_with_input(build_elements.0, vec![ElementInfo::Uranium]);
+    cmds.run_system(build_elements.0);
 }
 
 pub fn plugin(app: &mut App) {

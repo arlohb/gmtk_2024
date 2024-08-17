@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::{elements::ElementInfo, Player};
+use crate::{
+    elements::{BuildElements, ElementInfo},
+    Player,
+};
 
 #[derive(Component)]
 pub struct ShopButton(ElementInfo);
@@ -8,10 +11,14 @@ pub struct ShopButton(ElementInfo);
 pub fn shop_button_system(
     query: Query<(&Interaction, &ShopButton), Changed<Interaction>>,
     mut players: Query<&mut Player>,
+    build_elements: Res<BuildElements>,
+    mut cmds: Commands,
 ) {
     for (interaction, ShopButton(element)) in &query {
         if let Interaction::Pressed = interaction {
-            let player = players.single_mut();
+            let mut player = players.single_mut();
+            player.elements.push(*element);
+            cmds.run_system(build_elements.0);
         }
     }
 }

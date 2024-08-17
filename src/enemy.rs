@@ -16,6 +16,7 @@ pub fn create_enemy(mut cmds: Commands, mut build_molecule_event: EventWriter<Bu
             Velocity {
                 velocity: Vec3::ZERO,
                 drag: 0.04,
+                max_speed: None,
             },
             Molecule {
                 elements: vec![ElementInfo::Uranium],

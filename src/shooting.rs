@@ -15,6 +15,7 @@ pub fn create_bullet(
         Velocity {
             velocity: Vec3::new(dir.x, dir.y, 0.) * speed,
             drag: 0.,
+            max_speed: None,
         },
         SpriteBundle {
             sprite: Sprite {

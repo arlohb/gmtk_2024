@@ -20,6 +20,7 @@ pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<B
             Velocity {
                 velocity: Vec3::ZERO,
                 drag: 0.04,
+                max_speed: None,
             },
             Player,
             Molecule {

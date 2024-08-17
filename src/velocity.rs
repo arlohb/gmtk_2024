@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct Velocity {
+    // TODO: Make Vec2
     pub velocity: Vec3,
     pub drag: f32,
 }

@@ -6,9 +6,11 @@ mod camera;
 pub use camera::MainCamera;
 mod time_to_live;
 pub use time_to_live::TimeToLive;
+mod shooting;
 
 use bevy::{
     asset::AssetMetaCheck,
+    ecs::schedule::{LogLevel, ScheduleBuildSettings},
     prelude::*,
     render::texture::{
         ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor,
@@ -90,6 +92,7 @@ fn main() {
         .add_plugins(time_to_live::plugin)
         .add_plugins(velocity::plugin)
         .add_plugins(movement::plugin)
+        .add_plugins(shooting::plugin)
         .add_systems(Startup, (create_player, create_background))
         .run();
 }

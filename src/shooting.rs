@@ -30,7 +30,7 @@ pub fn create_bullet(
         },
         SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(16., 16.)),
+                custom_size: Some(Vec2::new(28., 28.)),
                 ..Default::default()
             },
             texture: assets.load("Electron.png"),

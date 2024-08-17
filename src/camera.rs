@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{follow::follow_system, velocity, Player};
+use crate::{follow::follow_system, molecule::Molecule, velocity, Player};
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -25,9 +25,22 @@ pub fn setup_camera(mut cmds: Commands, mut clear_color: ResMut<ClearColor>) {
     ));
 }
 
+pub fn zoom_camera(
+    mut camera: Query<&mut OrthographicProjection, With<MainCamera>>,
+    player: Query<&Molecule, With<Player>>,
+) {
+    let mut camera = camera.single_mut();
+    let player = player.single();
+
+    let target = player.elements.len() as f32 / 8. + 1.;
+    camera.scale = camera.scale.lerp(target, 0.1);
+}
+
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, setup_camera).add_systems(
-        FixedPostUpdate,
-        follow_system::<MainCamera, Player, 10>.after(velocity::apply_velocity),
-    );
+    app.add_systems(Startup, setup_camera)
+        .add_systems(
+            FixedPostUpdate,
+            follow_system::<MainCamera, Player, 10>.after(velocity::apply_velocity),
+        )
+        .add_systems(Update, zoom_camera);
 }

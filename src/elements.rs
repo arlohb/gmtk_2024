@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::health::{Health, HealthSprite};
+use crate::{
+    health::{Health, HealthSprite},
+    shooting::Shooter,
+};
 
 #[derive(Component)]
 pub struct Atom;
@@ -59,7 +62,7 @@ impl ElementInfo {
                     parent.spawn(health);
                 }),
             ElementInfo::Uranium => parent
-                .spawn((sprite_bundle, Atom, Health::new(100.), Uranium))
+                .spawn((sprite_bundle, Atom, Health::new(100.), Uranium, Shooter))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),

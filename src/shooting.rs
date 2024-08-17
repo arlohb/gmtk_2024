@@ -51,11 +51,15 @@ impl FromWorld for CreateBullet {
     }
 }
 
+#[derive(Component)]
+pub struct Shooter;
+
 fn player_shoot(
     create_bullet: Res<CreateBullet>,
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    players: Query<&GlobalTransform, With<Player>>,
+    shooters: Query<(&GlobalTransform, &Parent), With<Shooter>>,
+    players: Query<Entity, With<Player>>,
     mouse_btns: Res<ButtonInput<MouseButton>>,
     mut cmds: Commands,
 ) {
@@ -68,11 +72,16 @@ fn player_shoot(
         return;
     };
 
-    let player = players.single();
-    let origin = player.translation().xy();
+    for (shooter, parent) in &shooters {
+        if !players.contains(parent.get()) {
+            continue;
+        }
 
-    if mouse_btns.just_pressed(MouseButton::Left) {
-        cmds.run_system_with_input(create_bullet.0, (origin, target, Bullet::FromPlayer));
+        let origin = shooter.translation().xy();
+
+        if mouse_btns.just_pressed(MouseButton::Left) {
+            cmds.run_system_with_input(create_bullet.0, (origin, target, Bullet::FromPlayer));
+        }
     }
 }
 

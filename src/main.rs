@@ -31,7 +31,7 @@ use bevy::{
 };
 
 fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
-    let texture = assets.load_with_settings("Grid.png", |s| {
+    let texture = assets.load_with_settings("Background.png", |s| {
         *s = ImageLoaderSettings {
             sampler: ImageSampler::Descriptor(ImageSamplerDescriptor {
                 address_mode_u: ImageAddressMode::Repeat,
@@ -42,16 +42,16 @@ fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
         }
     });
 
-    let size = 2048.;
+    let size = 2f32.powi(16);
 
     cmds.spawn(SpriteBundle {
         sprite: Sprite {
-            color: Color::linear_rgb(0.1, 0.1, 0.1),
+            color: Color::linear_rgb(1., 1., 1.),
             rect: Some(Rect::new(0., 0., size, size)),
             ..Default::default()
         },
         texture,
-        transform: Transform::from_xyz(0., 0., -1.),
+        transform: Transform::from_xyz(0., 0., -1.).with_scale(Vec3::new(4., 4., 1.)),
         ..Default::default()
     });
 }

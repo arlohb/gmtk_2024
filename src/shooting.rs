@@ -8,7 +8,7 @@ use crate::{
     MainCamera, Player, TimeToLive, Velocity,
 };
 
-#[derive(Component, Clone)]
+#[derive(Component, Clone, PartialEq, Eq)]
 pub enum Bullet {
     FromPlayer,
     FromEnemy,
@@ -76,13 +76,20 @@ fn player_shoot(
     }
 }
 
-// TODO, Need to despawn the bullet
 #[derive(Event)]
-pub struct BulletHit(pub Entity, pub Bullet);
+pub struct BulletHit {
+    pub bullet: Entity,
+    pub bullet_type: Bullet,
+    pub atom: Entity,
+}
 
 impl CollisionEvent<Bullet, Atom> for BulletHit {
-    fn from_collision(_: Entity, bullet: &Bullet, b: Entity, _: &Atom) -> Self {
-        Self(b, bullet.clone())
+    fn from_collision(bullet: Entity, bullet_type: &Bullet, atom: Entity, _: &Atom) -> Self {
+        Self {
+            bullet,
+            bullet_type: bullet_type.clone(),
+            atom,
+        }
     }
 }
 
@@ -90,21 +97,29 @@ pub fn bullet_hit_system(
     mut events: EventReader<BulletHit>,
     players: Query<Entity, With<Player>>,
     mut healths: Query<(&mut Health, &Parent), With<Atom>>,
+    mut cmds: Commands,
 ) {
     let damage = 100. / 8.;
 
-    for BulletHit(atom, bullet) in events.read() {
+    for BulletHit {
+        bullet,
+        bullet_type,
+        atom,
+    } in events.read()
+    {
         let Ok((mut health, parent)) = healths.get_mut(*atom) else {
             return;
         };
 
         let is_player_atom = players.contains(**parent);
 
-        match (is_player_atom, bullet) {
-            (true, Bullet::FromEnemy) => health.health -= damage,
-            (false, Bullet::FromPlayer) => health.health -= damage,
-            _ => (),
-        };
+        let is_hit = is_player_atom && *bullet_type == Bullet::FromEnemy
+            || !is_player_atom && *bullet_type == Bullet::FromPlayer;
+
+        if is_hit {
+            health.health -= damage;
+            cmds.entity(*bullet).despawn();
+        }
     }
 }
 

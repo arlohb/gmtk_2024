@@ -1,12 +1,17 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
-pub struct ShopButton(String);
+use crate::{elements::ElementInfo, Player};
 
-pub fn shop_button_system(query: Query<(&Interaction, &ShopButton), Changed<Interaction>>) {
+#[derive(Component)]
+pub struct ShopButton(ElementInfo);
+
+pub fn shop_button_system(
+    query: Query<(&Interaction, &ShopButton), Changed<Interaction>>,
+    mut players: Query<&mut Player>,
+) {
     for (interaction, ShopButton(element)) in &query {
         if let Interaction::Pressed = interaction {
-            info!("{}", element);
+            let player = players.single_mut();
         }
     }
 }
@@ -22,7 +27,11 @@ pub fn shop_setup(mut cmds: Commands, assets: Res<AssetServer>) {
         ..Default::default()
     })
     .with_children(|parent| {
-        for image in ["ElementH.png", "ElementFe.png", "ElementU.png"] {
+        for element in [
+            ElementInfo::Hydrogen,
+            ElementInfo::Iron,
+            ElementInfo::Uranium,
+        ] {
             parent
                 .spawn((
                     ButtonBundle {
@@ -32,12 +41,12 @@ pub fn shop_setup(mut cmds: Commands, assets: Res<AssetServer>) {
                         },
                         ..Default::default()
                     },
-                    ShopButton(image.to_string()),
+                    ShopButton(element),
                 ))
                 .with_children(|button| {
                     button.spawn(ImageBundle {
                         image: UiImage {
-                            texture: assets.load(image),
+                            texture: assets.load(element.image_path()),
                             ..Default::default()
                         },
                         ..Default::default()

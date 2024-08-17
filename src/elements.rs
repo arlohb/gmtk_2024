@@ -2,34 +2,45 @@ use bevy::{ecs::system::SystemId, prelude::*};
 
 use crate::Player;
 
+#[derive(Clone, Copy)]
 pub enum ElementInfo {
+    Hydrogen,
+    Iron,
     Uranium,
 }
 
 impl ElementInfo {
     pub fn image_path(&self) -> &'static str {
         match self {
+            ElementInfo::Hydrogen => "ElementH.png",
+            ElementInfo::Iron => "ElementFe.png",
             ElementInfo::Uranium => "ElementU.png",
         }
     }
 
-    pub fn build(&self, assets: &AssetServer) -> impl Bundle {
+    pub fn build(&self, parent: &mut ChildBuilder, assets: &AssetServer) {
+        let sprite_bundle = SpriteBundle {
+            sprite: Sprite {
+                color: Color::linear_rgb(1., 1., 1.),
+                custom_size: Some(Vec2::new(64., 64.)),
+                ..Default::default()
+            },
+            texture: assets.load(self.image_path()),
+            ..Default::default()
+        };
         match self {
-            ElementInfo::Uranium => (
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: Color::linear_rgb(1., 1., 1.),
-                        custom_size: Some(Vec2::new(64., 64.)),
-                        ..Default::default()
-                    },
-                    texture: assets.load(self.image_path()),
-                    ..Default::default()
-                },
-                Uranium,
-            ),
-        }
+            ElementInfo::Hydrogen => parent.spawn((sprite_bundle, Hydrogen)),
+            ElementInfo::Iron => parent.spawn((sprite_bundle, Iron)),
+            ElementInfo::Uranium => parent.spawn((sprite_bundle, Uranium)),
+        };
     }
 }
+
+#[derive(Component)]
+pub struct Hydrogen;
+
+#[derive(Component)]
+pub struct Iron;
 
 #[derive(Component)]
 pub struct Uranium;
@@ -53,10 +64,7 @@ pub fn build_elements(
         .with_children(|parent| {
             elements
                 .iter()
-                .map(|element| element.build(&assets))
-                .for_each(|child| {
-                    parent.spawn(child);
-                });
+                .for_each(|element| element.build(parent, &assets));
         });
 }
 

@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     elements::{Atom, ElementInfo},
+    enemy::Enemy,
+    energy::Energy,
     health::Health,
 };
 
@@ -130,8 +132,10 @@ pub fn build_molecules_system(
 }
 
 pub fn molecule_health_system(
+    enemies: Query<&Enemy>,
     query: Query<(Entity, &Health, &Parent), With<Atom>>,
     mut build_molecule_event: EventWriter<BuildMolecule>,
+    mut energy: ResMut<Energy>,
 ) {
     for (entity, health, parent) in query.iter() {
         if health.health <= 0. {
@@ -139,6 +143,10 @@ pub fn molecule_health_system(
                 target: parent.get(),
                 atom: entity,
             });
+
+            if enemies.contains(parent.get()) {
+                energy.0 += 10.;
+            }
         }
     }
 }

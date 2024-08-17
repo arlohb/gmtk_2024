@@ -15,6 +15,7 @@ pub use player::Player;
 mod collision;
 mod elements;
 mod enemy;
+mod energy;
 mod follow;
 mod health;
 mod molecule;
@@ -87,6 +88,7 @@ fn main() {
         .add_plugins(enemy::plugin)
         .add_plugins(health::plugin)
         .add_plugins(wave::plugin)
+        .add_plugins(energy::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

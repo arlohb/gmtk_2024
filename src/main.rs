@@ -76,7 +76,7 @@ fn main() {
         .add_plugins(shooting::plugin)
         .add_plugins(shop::plugin)
         .add_plugins(player::plugin)
-        .add_plugins(elements::plugin)
+        .add_plugins(molecule::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

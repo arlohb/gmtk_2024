@@ -1,6 +1,4 @@
-use bevy::{ecs::system::SystemId, prelude::*};
-
-use crate::{molecule::Molecule, Player};
+use bevy::prelude::*;
 
 #[derive(Clone, Copy)]
 pub enum ElementInfo {
@@ -45,57 +43,3 @@ pub struct Iron;
 
 #[derive(Component)]
 pub struct Uranium;
-
-fn create_polygon(points: usize) -> Vec<Vec2> {
-    let start_point = match points {
-        1 => Vec2::new(0., 0.),
-        2 => Vec2::new(-36., 0.),
-        4 => Vec2::new(48., 48.),
-        _ => Vec2::new(0., points as f32 * 16.),
-    };
-
-    (0..points)
-        .map(|i| Rot2::degrees(i as f32 * -360. / points as f32) * start_point)
-        .collect()
-}
-
-pub fn build_elements(
-    assets: Res<AssetServer>,
-    molecules: Query<(Entity, &Molecule, Option<&Children>), With<Player>>,
-    mut cmds: Commands,
-) {
-    let (molecule_id, molecule, old_children) = molecules.single();
-
-    cmds.entity(molecule_id)
-        .clear_children()
-        .with_children(|parent| {
-            let offsets = create_polygon(molecule.elements.len());
-
-            molecule
-                .elements
-                .iter()
-                .enumerate()
-                .for_each(|(i, element)| {
-                    element.build(parent, &assets, offsets[i]);
-                });
-        });
-
-    if let Some(old_children) = old_children {
-        old_children.iter().for_each(|child| {
-            cmds.entity(*child).despawn();
-        });
-    }
-}
-
-#[derive(Resource)]
-pub struct BuildElements(pub SystemId);
-
-impl FromWorld for BuildElements {
-    fn from_world(world: &mut World) -> Self {
-        Self(world.register_system(build_elements))
-    }
-}
-
-pub fn plugin(app: &mut App) {
-    app.init_resource::<BuildElements>();
-}

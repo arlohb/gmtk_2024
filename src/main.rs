@@ -4,6 +4,8 @@ mod velocity;
 pub use velocity::*;
 mod camera;
 pub use camera::*;
+mod time_to_live;
+pub use time_to_live::TimeToLive;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -77,6 +79,7 @@ fn main() {
                     default_sampler: ImageSamplerDescriptor::nearest(),
                 }),
         )
+        .add_plugins(time_to_live::plugin)
         .add_systems(Startup, (create_player, setup_camera, create_background))
         .add_systems(FixedUpdate, movement_system)
         .add_systems(

@@ -11,6 +11,7 @@ mod shooting;
 mod shop;
 pub use player::Player;
 mod elements;
+mod enemy;
 mod molecule;
 
 use bevy::{
@@ -77,6 +78,7 @@ fn main() {
         .add_plugins(shop::plugin)
         .add_plugins(player::plugin)
         .add_plugins(molecule::plugin)
+        .add_plugins(enemy::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

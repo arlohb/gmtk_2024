@@ -13,6 +13,7 @@ pub use player::Player;
 mod elements;
 mod enemy;
 mod follow;
+mod health;
 mod molecule;
 
 use bevy::{

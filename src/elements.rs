@@ -1,5 +1,10 @@
 use bevy::prelude::*;
 
+use crate::health::Health;
+
+#[derive(Component)]
+pub struct Atom;
+
 #[derive(Clone, Copy)]
 pub enum ElementInfo {
     Hydrogen,
@@ -28,9 +33,11 @@ impl ElementInfo {
             ..Default::default()
         };
         match self {
-            ElementInfo::Hydrogen => parent.spawn((sprite_bundle, Hydrogen)),
-            ElementInfo::Iron => parent.spawn((sprite_bundle, Iron)),
-            ElementInfo::Uranium => parent.spawn((sprite_bundle, Uranium)),
+            ElementInfo::Hydrogen => {
+                parent.spawn((sprite_bundle, Atom, Health::new(100.), Hydrogen))
+            }
+            ElementInfo::Iron => parent.spawn((sprite_bundle, Atom, Health::new(0.), Iron)),
+            ElementInfo::Uranium => parent.spawn((sprite_bundle, Atom, Health::new(100.), Uranium)),
         };
     }
 }

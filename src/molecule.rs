@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::elements::ElementInfo;
+use crate::{
+    elements::{Atom, ElementInfo},
+    health::Health,
+};
 
 #[derive(Event)]
 pub enum BuildMolecule {
@@ -92,14 +95,39 @@ pub fn build_molecules_system(
                     .find(|(_, child)| **child == atom)
                 {
                     molecule.elements.remove(index);
-                    cmds.entity(atom).remove_parent();
+                    cmds.entity(atom).remove_parent().despawn();
+
+                    let offsets = create_polygon(molecule.elements.len());
+
+                    for (i, child) in old_children.iter().enumerate().filter(|(i, _)| *i != index) {
+                        let pos = &mut child_transforms.get_mut(*child).unwrap().translation;
+                        let offset = offsets[if i > index { i - 1 } else { i }];
+                        pos.x = offset.x;
+                        pos.y = offset.y;
+                    }
                 }
             }
         }
     }
 }
 
+pub fn molecule_health_system(
+    query: Query<(Entity, &Health, &Parent), With<Atom>>,
+    mut build_molecule_event: EventWriter<BuildMolecule>,
+) {
+    for (entity, health, parent) in query.iter() {
+        if health.health <= 0. {
+            build_molecule_event.send(BuildMolecule::RemoveAtom {
+                target: parent.get(),
+                atom: entity,
+            });
+        }
+    }
+}
+
 pub fn plugin(app: &mut App) {
-    app.add_event::<BuildMolecule>()
-        .add_systems(Update, build_molecules_system);
+    app.add_event::<BuildMolecule>().add_systems(
+        Update,
+        (molecule_health_system, build_molecules_system).chain(),
+    );
 }

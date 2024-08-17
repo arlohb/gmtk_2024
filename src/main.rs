@@ -18,6 +18,7 @@ mod enemy;
 mod follow;
 mod health;
 mod molecule;
+mod wave;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -85,6 +86,7 @@ fn main() {
         .add_plugins(molecule::plugin)
         .add_plugins(enemy::plugin)
         .add_plugins(health::plugin)
+        .add_plugins(wave::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

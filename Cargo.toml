@@ -105,4 +105,5 @@ bevy = { version = "0.14", default-features = false, features = [
     # "embedded_watcher",  # Hot-reloading for Bevy's internal/builtin assets
     # "system_steeping",   # Stepping through systems
 ] }
+rand = "0.8"
 

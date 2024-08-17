@@ -127,7 +127,7 @@ pub fn bullet_hit_system(
 
         if is_hit {
             health.health -= damage;
-            cmds.entity(*bullet).despawn();
+            let _ = cmds.get_entity(*bullet).map(|mut entity| entity.despawn());
         }
     }
 }

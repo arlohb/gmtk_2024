@@ -42,14 +42,14 @@ pub fn build_molecules_system(
     mut events: EventReader<BuildMolecule>,
     assets: Res<AssetServer>,
     mut cmds: Commands,
-    mut molecules: Query<(&mut Molecule, Option<&Children>)>,
+    mut molecules: Query<(Entity, &mut Molecule, Option<&Children>)>,
     mut child_transforms: Query<&mut Transform, With<Parent>>,
 ) {
     for event in events.read() {
         match *event {
             BuildMolecule::Create { target } => {
                 cmds.entity(target).with_children(|parent| {
-                    let Ok((molecule, _)) = molecules.get(target) else {
+                    let Ok((_, molecule, _)) = molecules.get(target) else {
                         return;
                     };
 
@@ -65,7 +65,7 @@ pub fn build_molecules_system(
                 });
             }
             BuildMolecule::Add { target, element } => {
-                let Ok((mut molecule, Some(old_children))) = molecules.get_mut(target) else {
+                let Ok((_, mut molecule, Some(old_children))) = molecules.get_mut(target) else {
                     return;
                 };
 
@@ -85,7 +85,8 @@ pub fn build_molecules_system(
                 });
             }
             BuildMolecule::RemoveAtom { target, atom } => {
-                let Ok((mut molecule, Some(old_children))) = molecules.get_mut(target) else {
+                let Ok((entity, mut molecule, Some(old_children))) = molecules.get_mut(target)
+                else {
                     return;
                 };
 
@@ -94,8 +95,13 @@ pub fn build_molecules_system(
                     .enumerate()
                     .find(|(_, child)| **child == atom)
                 {
+                    // If this is the only child
+                    if molecule.elements.len() == 1 {
+                        cmds.entity(entity).despawn_recursive();
+                        continue;
+                    }
+
                     molecule.elements.remove(index);
-                    // TODO: Parent should be despawned if it has no children
                     cmds.entity(atom).remove_parent().despawn();
 
                     let offsets = create_polygon(molecule.elements.len());

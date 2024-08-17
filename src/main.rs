@@ -12,6 +12,7 @@ mod shop;
 pub use player::Player;
 mod elements;
 mod enemy;
+mod follow;
 mod molecule;
 
 use bevy::{

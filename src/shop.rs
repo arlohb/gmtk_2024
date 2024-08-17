@@ -1,24 +1,22 @@
 use bevy::prelude::*;
 
-use crate::{
-    elements::ElementInfo,
-    molecule::{BuildMolecule, Molecule},
-    Player,
-};
+use crate::{elements::ElementInfo, molecule::BuildMolecule, Player};
 
 #[derive(Component)]
 pub struct ShopButton(ElementInfo);
 
 pub fn shop_button_system(
     query: Query<(&Interaction, &ShopButton), Changed<Interaction>>,
-    mut players: Query<(&mut Molecule, Entity), With<Player>>,
+    mut players: Query<Entity, With<Player>>,
     mut build_molecule_event: EventWriter<BuildMolecule>,
 ) {
-    for (interaction, ShopButton(element)) in &query {
+    for (interaction, &ShopButton(element)) in &query {
         if let Interaction::Pressed = interaction {
-            let (mut molecule, entity) = players.single_mut();
-            molecule.elements.push(*element);
-            build_molecule_event.send(BuildMolecule(entity));
+            let entity = players.single_mut();
+            build_molecule_event.send(BuildMolecule::Add {
+                target: entity,
+                element,
+            });
         }
     }
 }

@@ -3,7 +3,19 @@ use bevy::prelude::*;
 use crate::elements::ElementInfo;
 
 #[derive(Event)]
-pub struct BuildMolecule(pub Entity);
+pub enum BuildMolecule {
+    Create {
+        target: Entity,
+    },
+    Add {
+        target: Entity,
+        element: ElementInfo,
+    },
+    RemoveAtom {
+        target: Entity,
+        atom: Entity,
+    },
+}
 
 #[derive(Component)]
 pub struct Molecule {
@@ -27,31 +39,62 @@ pub fn build_molecules_system(
     mut events: EventReader<BuildMolecule>,
     assets: Res<AssetServer>,
     mut cmds: Commands,
-    molecules: Query<(&Molecule, Option<&Children>)>,
+    mut molecules: Query<(&mut Molecule, Option<&Children>)>,
+    mut child_transforms: Query<&mut Transform, With<Parent>>,
 ) {
-    for &BuildMolecule(entity) in events.read() {
-        let Ok((molecule, old_children)) = molecules.get(entity) else {
-            return;
-        };
+    for event in events.read() {
+        match *event {
+            BuildMolecule::Create { target } => {
+                cmds.entity(target).with_children(|parent| {
+                    let Ok((molecule, _)) = molecules.get(target) else {
+                        return;
+                    };
 
-        cmds.entity(entity)
-            .clear_children()
-            .with_children(|parent| {
+                    let offsets = create_polygon(molecule.elements.len());
+
+                    molecule
+                        .elements
+                        .iter()
+                        .enumerate()
+                        .for_each(|(i, element)| {
+                            element.build(parent, &assets, offsets[i]);
+                        });
+                });
+            }
+            BuildMolecule::Add { target, element } => {
+                let Ok((mut molecule, Some(old_children))) = molecules.get_mut(target) else {
+                    return;
+                };
+
+                molecule.elements.push(element);
+
                 let offsets = create_polygon(molecule.elements.len());
 
-                molecule
-                    .elements
+                for (i, child) in old_children.iter().enumerate() {
+                    let pos = &mut child_transforms.get_mut(*child).unwrap().translation;
+                    let offset = offsets[i];
+                    pos.x = offset.x;
+                    pos.y = offset.y;
+                }
+
+                cmds.entity(target).with_children(|parent| {
+                    element.build(parent, &assets, *offsets.last().unwrap());
+                });
+            }
+            BuildMolecule::RemoveAtom { target, atom } => {
+                let Ok((mut molecule, Some(old_children))) = molecules.get_mut(target) else {
+                    return;
+                };
+
+                if let Some((index, _)) = old_children
                     .iter()
                     .enumerate()
-                    .for_each(|(i, element)| {
-                        element.build(parent, &assets, offsets[i]);
-                    });
-            });
-
-        if let Some(old_children) = old_children {
-            old_children.iter().for_each(|child| {
-                cmds.entity(*child).despawn();
-            });
+                    .find(|(_, child)| **child == atom)
+                {
+                    molecule.elements.remove(index);
+                    cmds.entity(atom).remove_parent();
+                }
+            }
         }
     }
 }

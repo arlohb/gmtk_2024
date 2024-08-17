@@ -29,7 +29,7 @@ pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<B
         ))
         .id();
 
-    build_molecule_event.send(BuildMolecule(id));
+    build_molecule_event.send(BuildMolecule::Create { target: id });
 }
 
 pub fn plugin(app: &mut App) {

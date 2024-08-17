@@ -25,7 +25,7 @@ pub fn create_enemy(mut cmds: Commands, mut build_molecule_event: EventWriter<Bu
         ))
         .id();
 
-    build_molecule_event.send(BuildMolecule(id));
+    build_molecule_event.send(BuildMolecule::Create { target: id });
 }
 
 pub fn enemy_movement_system(

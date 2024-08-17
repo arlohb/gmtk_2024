@@ -5,7 +5,7 @@ use crate::{
     shooting::Shooter,
 };
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Atom;
 
 #[derive(Clone, Copy)]

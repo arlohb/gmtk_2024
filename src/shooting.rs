@@ -85,35 +85,19 @@ fn player_shoot(
     }
 }
 
-#[derive(Event)]
-pub struct BulletHit {
-    pub bullet: Entity,
-    pub bullet_type: Bullet,
-    pub atom: Entity,
-}
-
-impl CollisionEvent<Bullet, Atom> for BulletHit {
-    fn from_collision(bullet: Entity, bullet_type: &Bullet, atom: Entity, _: &Atom) -> Self {
-        Self {
-            bullet,
-            bullet_type: bullet_type.clone(),
-            atom,
-        }
-    }
-}
-
 pub fn bullet_hit_system(
-    mut events: EventReader<BulletHit>,
+    mut events: EventReader<CollisionEvent<Bullet, Atom>>,
     players: Query<Entity, With<Player>>,
     mut healths: Query<(&mut Health, &Parent), With<Atom>>,
     mut cmds: Commands,
 ) {
     let damage = 100. / 8.;
 
-    for BulletHit {
-        bullet,
-        bullet_type,
-        atom,
+    for CollisionEvent {
+        a_id: bullet,
+        a_comp: bullet_type,
+        b_id: atom,
+        ..
     } in events.read()
     {
         let Ok((mut health, parent)) = healths.get_mut(*atom) else {
@@ -134,14 +118,10 @@ pub fn bullet_hit_system(
 
 pub fn plugin(app: &mut App) {
     app.init_resource::<CreateBullet>()
-        .add_event::<BulletHit>()
+        .add_event::<CollisionEvent<Bullet, Atom>>()
         .add_systems(Update, player_shoot)
         .add_systems(
             Update,
-            (
-                collision_system::<Bullet, Atom, BulletHit>,
-                bullet_hit_system,
-            )
-                .chain(),
+            (collision_system::<Bullet, Atom>, bullet_hit_system).chain(),
         );
 }

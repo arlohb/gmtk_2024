@@ -49,13 +49,13 @@ pub struct Uranium;
 fn create_polygon(points: usize) -> Vec<Vec2> {
     let start_point = match points {
         1 => Vec2::new(0., 0.),
-        2 => Vec2::new(36., 0.),
+        2 => Vec2::new(-36., 0.),
         4 => Vec2::new(48., 48.),
         _ => Vec2::new(0., points as f32 * 16.),
     };
 
     (0..points)
-        .map(|i| Rot2::degrees(i as f32 * 360. / points as f32) * start_point)
+        .map(|i| Rot2::degrees(i as f32 * -360. / points as f32) * start_point)
         .collect()
 }
 

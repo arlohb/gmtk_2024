@@ -6,8 +6,10 @@ mod camera;
 pub use camera::MainCamera;
 mod time_to_live;
 pub use time_to_live::TimeToLive;
+mod player;
 mod shooting;
 mod shop;
+pub use player::Player;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -17,30 +19,6 @@ use bevy::{
         ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor,
     },
 };
-
-fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
-    let circle = assets.load("ElementU.png");
-
-    cmds.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1., 1., 1.),
-                custom_size: Some(Vec2::new(64., 64.)),
-                ..Default::default()
-            },
-            texture: circle,
-            ..Default::default()
-        },
-        Movement {
-            acceleration: 1.,
-            max_velocity: 15.,
-        },
-        Velocity {
-            velocity: Vec3::ZERO,
-            drag: 0.04,
-        },
-    ));
-}
 
 fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
     let texture = assets.load_with_settings("Grid.png", |s| {
@@ -95,6 +73,7 @@ fn main() {
         .add_plugins(movement::plugin)
         .add_plugins(shooting::plugin)
         .add_plugins(shop::plugin)
-        .add_systems(Startup, (create_player, create_background))
+        .add_plugins(player::plugin)
+        .add_systems(Startup, create_background)
         .run();
 }

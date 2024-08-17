@@ -1,7 +1,7 @@
 use bevy::{ecs::system::SystemId, prelude::*};
 use std::time::Duration;
 
-use crate::{MainCamera, Movement, TimeToLive, Velocity};
+use crate::{MainCamera, Player, TimeToLive, Velocity};
 
 pub fn create_bullet(
     In((origin, target)): In<(Vec2, Vec2)>,
@@ -42,7 +42,7 @@ fn player_shoot(
     create_bullet: Res<CreateBullet>,
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    players: Query<&GlobalTransform, With<Movement>>,
+    players: Query<&GlobalTransform, With<Player>>,
     mouse_btns: Res<ButtonInput<MouseButton>>,
     mut cmds: Commands,
 ) {

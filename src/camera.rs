@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{velocity, Movement};
+use crate::{velocity, Player};
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -26,8 +26,8 @@ pub fn setup_camera(mut cmds: Commands, mut clear_color: ResMut<ClearColor>) {
 }
 
 pub fn follow_player(
-    mut camera: Query<&mut Transform, (With<MainCamera>, Without<Movement>)>,
-    player: Query<&Transform, With<Movement>>,
+    mut camera: Query<&mut Transform, (With<MainCamera>, Without<Player>)>,
+    player: Query<&Transform, With<Player>>,
 ) {
     let camera = &mut camera.single_mut().translation;
     let player = player.single().translation;

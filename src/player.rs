@@ -1,23 +1,18 @@
 use bevy::prelude::*;
 
-use crate::{Movement, Velocity};
+use crate::{
+    elements::{build_elements, ElementInfo},
+    Movement, Velocity,
+};
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player {
+    pub elements: Vec<ElementInfo>,
+}
 
 pub fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
-    let circle = assets.load("ElementU.png");
-
     cmds.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::linear_rgb(1., 1., 1.),
-                custom_size: Some(Vec2::new(64., 64.)),
-                ..Default::default()
-            },
-            texture: circle,
-            ..Default::default()
-        },
+        SpatialBundle::default(),
         Movement {
             acceleration: 1.,
             max_velocity: 15.,
@@ -26,8 +21,15 @@ pub fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
             velocity: Vec3::ZERO,
             drag: 0.04,
         },
-        Player,
-    ));
+        Player {
+            elements: vec![ElementInfo::Uranium],
+        },
+    ))
+    .with_children(|parent| {
+        for child in build_elements(&[ElementInfo::Uranium], &assets) {
+            parent.spawn(child);
+        }
+    });
 }
 
 pub fn plugin(app: &mut App) {

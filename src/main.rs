@@ -10,6 +10,7 @@ mod player;
 mod shooting;
 mod shop;
 pub use player::Player;
+mod elements;
 
 use bevy::{
     asset::AssetMetaCheck,

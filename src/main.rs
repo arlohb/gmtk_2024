@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 mod movement;
 pub use movement::*;
 mod velocity;
@@ -10,6 +12,7 @@ mod player;
 mod shooting;
 mod shop;
 pub use player::Player;
+mod collision;
 mod elements;
 mod enemy;
 mod follow;

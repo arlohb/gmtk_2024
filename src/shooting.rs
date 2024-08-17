@@ -1,10 +1,21 @@
 use bevy::{ecs::system::SystemId, prelude::*};
 use std::time::Duration;
 
-use crate::{MainCamera, Player, TimeToLive, Velocity};
+use crate::{
+    collision::{collision_system, CollisionEvent},
+    elements::Atom,
+    health::Health,
+    MainCamera, Player, TimeToLive, Velocity,
+};
+
+#[derive(Component, Clone)]
+pub enum Bullet {
+    FromPlayer,
+    FromEnemy,
+}
 
 pub fn create_bullet(
-    In((origin, target)): In<(Vec2, Vec2)>,
+    In((origin, target, bullet)): In<(Vec2, Vec2, Bullet)>,
     mut cmds: Commands,
     assets: ResMut<AssetServer>,
 ) {
@@ -27,11 +38,12 @@ pub fn create_bullet(
             ..Default::default()
         },
         TimeToLive::new(Duration::from_secs(2)),
+        bullet,
     ));
 }
 
 #[derive(Resource)]
-pub struct CreateBullet(SystemId<(Vec2, Vec2)>);
+pub struct CreateBullet(SystemId<(Vec2, Vec2, Bullet)>);
 
 impl FromWorld for CreateBullet {
     fn from_world(world: &mut World) -> Self {
@@ -60,11 +72,49 @@ fn player_shoot(
     let origin = player.translation().xy();
 
     if mouse_btns.just_pressed(MouseButton::Left) {
-        cmds.run_system_with_input(create_bullet.0, (origin, target));
+        cmds.run_system_with_input(create_bullet.0, (origin, target, Bullet::FromPlayer));
+    }
+}
+
+#[derive(Event)]
+pub struct BulletHit(pub Entity, pub Bullet);
+
+impl CollisionEvent<Bullet, Atom> for BulletHit {
+    fn from_collision(_: Entity, bullet: &Bullet, b: Entity, _: &Atom) -> Self {
+        Self(b, bullet.clone())
+    }
+}
+
+pub fn bullet_hit_system(
+    mut events: EventReader<BulletHit>,
+    players: Query<Entity, With<Player>>,
+    mut healths: Query<(&mut Health, &Parent), With<Atom>>,
+) {
+    for BulletHit(atom, bullet) in events.read() {
+        let Ok((mut health, parent)) = healths.get_mut(*atom) else {
+            return;
+        };
+
+        let is_player_atom = players.contains(**parent);
+
+        match (is_player_atom, bullet) {
+            (true, Bullet::FromEnemy) => health.health -= 100.,
+            (false, Bullet::FromPlayer) => health.health -= 100.,
+            _ => (),
+        };
     }
 }
 
 pub fn plugin(app: &mut App) {
     app.init_resource::<CreateBullet>()
-        .add_systems(Update, player_shoot);
+        .add_event::<BulletHit>()
+        .add_systems(Update, player_shoot)
+        .add_systems(
+            Update,
+            (
+                collision_system::<Bullet, Atom, BulletHit>,
+                bullet_hit_system,
+            )
+                .chain(),
+        );
 }

@@ -95,6 +95,7 @@ pub fn build_molecules_system(
                     .find(|(_, child)| **child == atom)
                 {
                     molecule.elements.remove(index);
+                    // TODO: Parent should be despawned if it has no children
                     cmds.entity(atom).remove_parent().despawn();
 
                     let offsets = create_polygon(molecule.elements.len());

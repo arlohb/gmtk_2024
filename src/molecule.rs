@@ -25,6 +25,17 @@ pub struct Molecule {
     pub elements: Vec<ElementInfo>,
 }
 
+impl Molecule {
+    pub fn collision_radius(&self) -> f32 {
+        (match self.elements.len() {
+            1 => 32.,
+            2 => 56.,
+            4 => 64.,
+            n => n as f32 * 24.,
+        }) + 24.
+    }
+}
+
 fn create_polygon(points: usize) -> Vec<Vec2> {
     let start_point = match points {
         1 => Vec2::new(0., 0.),

@@ -67,6 +67,12 @@ fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
 
 fn main() {
     App::new()
+        // Enable ambiguity detection
+        // Have to ignore the warning for time_system and event_update_system
+        .configure_schedules(ScheduleBuildSettings {
+            ambiguity_detection: LogLevel::Warn,
+            ..Default::default()
+        })
         .add_plugins(
             DefaultPlugins
                 .set(AssetPlugin {

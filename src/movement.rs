@@ -37,3 +37,7 @@ pub fn movement_system(
     velocity.velocity += Vec3::new(offset.x, offset.y, 0.);
     velocity.velocity = velocity.velocity.clamp_length_max(movement.max_velocity);
 }
+
+pub fn plugin(app: &mut App) {
+    app.add_systems(FixedUpdate, movement_system);
+}

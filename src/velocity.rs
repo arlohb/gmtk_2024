@@ -14,3 +14,7 @@ pub fn apply_velocity(mut query: Query<(&mut Transform, &mut Velocity)>) {
         velocity.velocity -= v_decrease;
     }
 }
+
+pub fn plugin(app: &mut App) {
+    app.add_systems(FixedPostUpdate, apply_velocity);
+}

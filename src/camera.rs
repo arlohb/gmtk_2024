@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::Movement;
+use crate::{velocity, Movement};
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -35,4 +35,11 @@ pub fn follow_player(
     let z = camera.z;
     *camera = camera.lerp(player, 0.1);
     camera.z = z;
+}
+
+pub fn plugin(app: &mut App) {
+    app.add_systems(Startup, setup_camera).add_systems(
+        FixedPostUpdate,
+        follow_player.after(velocity::apply_velocity),
+    );
 }

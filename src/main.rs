@@ -1,9 +1,9 @@
 mod movement;
 pub use movement::*;
 mod velocity;
-pub use velocity::*;
+pub use velocity::Velocity;
 mod camera;
-pub use camera::*;
+pub use camera::MainCamera;
 mod time_to_live;
 pub use time_to_live::TimeToLive;
 
@@ -79,12 +79,10 @@ fn main() {
                     default_sampler: ImageSamplerDescriptor::nearest(),
                 }),
         )
+        .add_plugins(camera::plugin)
         .add_plugins(time_to_live::plugin)
-        .add_systems(Startup, (create_player, setup_camera, create_background))
-        .add_systems(FixedUpdate, movement_system)
-        .add_systems(
-            FixedPostUpdate,
-            (apply_velocity, follow_player.after(apply_velocity)),
-        )
+        .add_plugins(velocity::plugin)
+        .add_plugins(movement::plugin)
+        .add_systems(Startup, (create_player, create_background))
         .run();
 }

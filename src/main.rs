@@ -11,6 +11,7 @@ mod shooting;
 mod shop;
 pub use player::Player;
 mod elements;
+mod molecule;
 
 use bevy::{
     asset::AssetMetaCheck,

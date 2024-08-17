@@ -2,13 +2,12 @@ use bevy::prelude::*;
 
 use crate::{
     elements::{BuildElements, ElementInfo},
+    molecule::Molecule,
     Movement, Velocity,
 };
 
 #[derive(Component)]
-pub struct Player {
-    pub elements: Vec<ElementInfo>,
-}
+pub struct Player;
 
 pub fn create_player(mut cmds: Commands, build_elements: Res<BuildElements>) {
     cmds.spawn((
@@ -21,7 +20,8 @@ pub fn create_player(mut cmds: Commands, build_elements: Res<BuildElements>) {
             velocity: Vec3::ZERO,
             drag: 0.04,
         },
-        Player {
+        Player,
+        Molecule {
             elements: vec![ElementInfo::Uranium],
         },
     ));

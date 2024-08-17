@@ -1,6 +1,6 @@
 use bevy::{ecs::system::SystemId, prelude::*};
 
-use crate::Player;
+use crate::{molecule::Molecule, Player};
 
 #[derive(Clone, Copy)]
 pub enum ElementInfo {
@@ -61,19 +61,23 @@ fn create_polygon(points: usize) -> Vec<Vec2> {
 
 pub fn build_elements(
     assets: Res<AssetServer>,
-    players: Query<(Entity, &Player, Option<&Children>), With<Player>>,
+    molecules: Query<(Entity, &Molecule, Option<&Children>), With<Player>>,
     mut cmds: Commands,
 ) {
-    let (player_id, player, old_children) = players.single();
+    let (molecule_id, molecule, old_children) = molecules.single();
 
-    cmds.entity(player_id)
+    cmds.entity(molecule_id)
         .clear_children()
         .with_children(|parent| {
-            let offsets = create_polygon(player.elements.len());
+            let offsets = create_polygon(molecule.elements.len());
 
-            player.elements.iter().enumerate().for_each(|(i, element)| {
-                element.build(parent, &assets, offsets[i]);
-            });
+            molecule
+                .elements
+                .iter()
+                .enumerate()
+                .for_each(|(i, element)| {
+                    element.build(parent, &assets, offsets[i]);
+                });
         });
 
     if let Some(old_children) = old_children {

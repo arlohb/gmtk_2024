@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     elements::{BuildElements, ElementInfo},
+    molecule::Molecule,
     Player,
 };
 
@@ -10,7 +11,7 @@ pub struct ShopButton(ElementInfo);
 
 pub fn shop_button_system(
     query: Query<(&Interaction, &ShopButton), Changed<Interaction>>,
-    mut players: Query<&mut Player>,
+    mut players: Query<&mut Molecule, With<Player>>,
     build_elements: Res<BuildElements>,
     mut cmds: Commands,
 ) {

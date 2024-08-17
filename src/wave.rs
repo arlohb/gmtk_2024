@@ -5,26 +5,28 @@ use crate::{
     elements::ElementInfo,
     enemy::Enemy,
     molecule::{build_molecules_system, BuildMolecule, Molecule},
-    Velocity,
+    Player, Velocity,
 };
 
 pub fn wave_check_system(
     enemies: Query<(), With<Enemy>>,
     mut cmds: Commands,
     mut build_molecule_event: EventWriter<BuildMolecule>,
+    players: Query<&Transform, With<Player>>,
 ) {
     if enemies.iter().len() != 0 {
         return;
     }
 
     let mut rng = rand::thread_rng();
+    let player = players.single().translation;
 
     for _ in 0..20 {
         let id = cmds
             .spawn((
                 SpatialBundle::from_transform(Transform::from_xyz(
-                    rng.gen_range(-1000.0..1000.0),
-                    rng.gen_range(-1000.0..1000.0),
+                    player.x + rng.gen_range(-1000.0..1000.0),
+                    player.y + rng.gen_range(-1000.0..1000.0),
                     0.,
                 )),
                 Velocity {

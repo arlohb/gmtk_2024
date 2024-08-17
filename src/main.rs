@@ -15,7 +15,7 @@ use bevy::{
     },
 };
 
-fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
+fn create_player(mut cmds: Commands, assets: Res<AssetServer>) {
     let circle = assets.load("ElementU.png");
 
     cmds.spawn((

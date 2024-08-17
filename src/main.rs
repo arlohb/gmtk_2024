@@ -14,7 +14,7 @@ use bevy::{
 };
 
 fn create_player(mut cmds: Commands, assets: ResMut<AssetServer>) {
-    let circle = assets.load("Circle.png");
+    let circle = assets.load("ElementU.png");
 
     cmds.spawn((
         SpriteBundle {
@@ -64,13 +64,19 @@ fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(AssetPlugin {
-            // Trunk doesn't return 404 if a file isn't there,
-            // so the meta check will assume it should be there,
-            // which it isn't
-            meta_check: AssetMetaCheck::Never,
-            ..Default::default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(AssetPlugin {
+                    // Trunk doesn't return 404 if a file isn't there,
+                    // so the meta check will assume it should be there,
+                    // which it isn't
+                    meta_check: AssetMetaCheck::Never,
+                    ..Default::default()
+                })
+                .set(ImagePlugin {
+                    default_sampler: ImageSamplerDescriptor::nearest(),
+                }),
+        )
         .add_systems(Startup, (create_player, setup_camera, create_background))
         .add_systems(FixedUpdate, movement_system)
         .add_systems(

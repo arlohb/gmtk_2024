@@ -6,7 +6,7 @@ use crate::{
     Movement, Velocity,
 };
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Player;
 
 pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<BuildMolecule>) {

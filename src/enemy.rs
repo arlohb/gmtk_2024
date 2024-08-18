@@ -55,14 +55,40 @@ pub fn enemy_internal_collision_system(
     }
 }
 
+pub fn enemy_player_collision_system(
+    mut events: EventReader<CollisionEvent<Player, Enemy>>,
+    players: Query<&Transform, (With<Player>, Without<Enemy>)>,
+    mut enemies: Query<(&mut Velocity, &Transform), (With<Enemy>, Without<Player>)>,
+) {
+    // Double enemy - enemy as only one side is pushing here.
+    let spacing_factor = 2.0;
+
+    for event in events.read() {
+        let Ok(player_trans) = players.get(event.a_id) else {
+            return;
+        };
+        let Ok((mut enemy_vel, enemy_trans)) = enemies.get_mut(event.b_id) else {
+            return;
+        };
+
+        let difference = (enemy_trans.translation.xy() - player_trans.translation.xy()).normalize();
+        let delta = difference * spacing_factor;
+
+        enemy_vel.velocity += Vec3::new(delta.x, delta.y, 0.);
+    }
+}
+
 pub fn plugin(app: &mut App) {
     app.add_event::<CollisionEvent<Enemy, Enemy>>()
+        .add_event::<CollisionEvent<Player, Enemy>>()
         .add_systems(FixedUpdate, enemy_movement_system)
         .add_systems(
             FixedUpdate,
             (
                 collision_system::<Enemy, Enemy>,
                 enemy_internal_collision_system,
+                collision_system::<Player, Enemy>,
+                enemy_player_collision_system,
             )
                 .chain(),
         );

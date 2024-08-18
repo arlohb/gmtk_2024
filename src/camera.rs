@@ -1,7 +1,4 @@
-use bevy::{
-    core_pipeline::bloom::{BloomCompositeMode, BloomSettings},
-    prelude::*,
-};
+use bevy::{core_pipeline::bloom::BloomSettings, prelude::*};
 
 use crate::{follow::follow_system, molecule::Molecule, velocity, Player};
 

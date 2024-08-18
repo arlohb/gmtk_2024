@@ -15,12 +15,13 @@ pub enum Bullet {
 }
 
 pub fn create_bullet(
-    In((origin, target, bullet)): In<(Vec2, Vec2, Bullet)>,
+    In((origin, dir, bullet)): In<(Vec2, Vec2, Bullet)>,
     mut cmds: Commands,
     assets: ResMut<AssetServer>,
 ) {
     let speed = 25.;
-    let dir = (target - origin).normalize();
+    // Just in case the caller didn't normalise it
+    let dir = dir.normalize();
 
     cmds.spawn((
         Velocity {
@@ -59,7 +60,7 @@ fn player_shoot(
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     shooters: Query<(&GlobalTransform, &Parent), With<Shooter>>,
-    players: Query<Entity, With<Player>>,
+    players: Query<&Transform, With<Player>>,
     mouse_btns: Res<ButtonInput<MouseButton>>,
     mut cmds: Commands,
 ) {
@@ -72,15 +73,16 @@ fn player_shoot(
         return;
     };
 
-    for (shooter, parent) in &shooters {
-        if !players.contains(parent.get()) {
-            continue;
-        }
+    if mouse_btns.just_pressed(MouseButton::Left) {
+        for (shooter, parent) in &shooters {
+            let Ok(player) = players.get(parent.get()) else {
+                continue;
+            };
 
-        let origin = shooter.translation().xy();
+            let origin = shooter.translation().xy();
+            let dir = target - player.translation.xy();
 
-        if mouse_btns.just_pressed(MouseButton::Left) {
-            cmds.run_system_with_input(create_bullet.0, (origin, target, Bullet::FromPlayer));
+            cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromPlayer));
         }
     }
 }

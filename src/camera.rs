@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    core_pipeline::bloom::{BloomCompositeMode, BloomSettings},
+    prelude::*,
+};
 
 use crate::{follow::follow_system, molecule::Molecule, velocity, Player};
 
@@ -20,6 +23,10 @@ pub fn setup_camera(mut cmds: Commands, mut clear_color: ResMut<ClearColor>) {
             },
             transform: Transform::from_xyz(0., 0., 10.),
             ..Default::default()
+        },
+        BloomSettings {
+            intensity: 0.3,
+            ..BloomSettings::NATURAL
         },
         MainCamera,
     ));

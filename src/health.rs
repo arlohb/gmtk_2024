@@ -6,11 +6,15 @@ pub struct HealthSprite;
 #[derive(Component)]
 pub struct Health {
     pub health: f32,
+    pub max_health: f32,
 }
 
 impl Health {
     pub fn new(health: f32) -> Self {
-        Self { health }
+        Self {
+            health,
+            max_health: health,
+        }
     }
 }
 
@@ -23,7 +27,7 @@ pub fn health_texture_system(
             continue;
         };
 
-        let percent = health.health / 100.;
+        let percent = health.health / health.max_health;
         let texture_index = (percent * 8.).ceil() - 1.;
 
         sprite.rect = Some(Rect::new(

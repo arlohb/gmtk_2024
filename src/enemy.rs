@@ -105,7 +105,7 @@ pub fn enemy_player_damage_system(
                 return;
             };
 
-            a_health.health -= 1.;
+            a_health.health -= 0.5;
         }
     }
 }

@@ -24,6 +24,14 @@ impl ElementInfo {
         }
     }
 
+    pub fn max_health(&self) -> f32 {
+        match self {
+            ElementInfo::Hydrogen => 100.,
+            ElementInfo::Iron => 300.,
+            ElementInfo::Uranium => 100.,
+        }
+    }
+
     pub fn build(
         &self,
         parent: &mut ChildBuilder,
@@ -62,17 +70,28 @@ impl ElementInfo {
 
         match self {
             ElementInfo::Hydrogen => parent
-                .spawn((sprite_bundle, Atom, Health::new(100.), Hydrogen))
+                .spawn((
+                    sprite_bundle,
+                    Atom,
+                    Health::new(self.max_health()),
+                    Hydrogen,
+                ))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
             ElementInfo::Iron => parent
-                .spawn((sprite_bundle, Atom, Health::new(0.), Iron))
+                .spawn((sprite_bundle, Atom, Health::new(self.max_health()), Iron))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
             ElementInfo::Uranium => parent
-                .spawn((sprite_bundle, Atom, Health::new(100.), Uranium, Shooter))
+                .spawn((
+                    sprite_bundle,
+                    Atom,
+                    Health::new(self.max_health()),
+                    Uranium,
+                    Shooter,
+                ))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),

@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     collision::{collision_system, CollisionEvent},
+    elements::Atom,
+    health::Health,
     Player, Velocity,
 };
 
@@ -14,7 +16,10 @@ pub fn enemy_movement_system(
     mut enemies: Query<(&mut Velocity, &Transform, &Enemy)>,
     players: Query<&Transform, With<Player>>,
 ) {
-    let player = players.single().translation.xy();
+    let Ok(player) = players.get_single() else {
+        return;
+    };
+    let player = player.translation.xy();
 
     for (mut velocity, origin, &Enemy { speed }) in &mut enemies {
         let offset = player - origin.translation.xy();
@@ -78,13 +83,43 @@ pub fn enemy_player_collision_system(
     }
 }
 
+pub fn enemy_player_damage_system(
+    mut events: EventReader<CollisionEvent<Atom, Atom>>,
+    mut healths: Query<&mut Health>,
+    parents: Query<&Parent>,
+    players: Query<&Transform, (With<Player>, Without<Enemy>)>,
+) {
+    for event in events.read() {
+        let Ok(a_parent) = parents.get(event.a_id) else {
+            return;
+        };
+        let Ok(b_parent) = parents.get(event.b_id) else {
+            return;
+        };
+
+        let a_is_player = players.contains(a_parent.get());
+        let b_is_player = players.contains(b_parent.get());
+
+        if a_is_player && !b_is_player {
+            let Ok(mut a_health) = healths.get_mut(event.a_id) else {
+                return;
+            };
+
+            a_health.health -= 1.;
+        }
+    }
+}
+
 pub fn plugin(app: &mut App) {
-    app.add_event::<CollisionEvent<Enemy, Enemy>>()
+    app.add_event::<CollisionEvent<Atom, Atom>>()
+        .add_event::<CollisionEvent<Enemy, Enemy>>()
         .add_event::<CollisionEvent<Player, Enemy>>()
-        .add_systems(FixedUpdate, enemy_movement_system)
         .add_systems(
             FixedUpdate,
             (
+                enemy_movement_system,
+                collision_system::<Atom, Atom>,
+                enemy_player_damage_system,
                 collision_system::<Enemy, Enemy>,
                 enemy_internal_collision_system,
                 collision_system::<Player, Enemy>,

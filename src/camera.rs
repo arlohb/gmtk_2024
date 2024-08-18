@@ -30,7 +30,9 @@ pub fn zoom_camera(
     player: Query<&Molecule, With<Player>>,
 ) {
     let mut camera = camera.single_mut();
-    let player = player.single();
+    let Ok(player) = player.get_single() else {
+        return;
+    };
 
     let target = player.elements.len() as f32 / 8. + 1.;
     camera.scale = camera.scale.lerp(target, 0.1);

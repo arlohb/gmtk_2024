@@ -12,7 +12,9 @@ pub fn movement_system(
     mut query: Query<(&mut Velocity, &Movement)>,
     keys: Res<ButtonInput<KeyCode>>,
 ) {
-    let (mut velocity, movement) = query.single_mut();
+    let Ok((mut velocity, movement)) = query.get_single_mut() else {
+        return;
+    };
 
     let mut offset = Vec2::ZERO;
 

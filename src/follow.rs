@@ -11,7 +11,10 @@ pub fn follow_system<
     mut followers: Query<&mut Transform, (With<Follower>, Without<Target>)>,
     target: Query<&Transform, With<Target>>,
 ) {
-    let target = target.single().translation;
+    let Ok(target) = target.get_single() else {
+        return;
+    };
+    let target = target.translation;
 
     for mut follower in &mut followers {
         let z = follower.translation.z;

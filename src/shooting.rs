@@ -15,6 +15,15 @@ pub enum Bullet {
     FromEnemy,
 }
 
+impl Bullet {
+    pub fn image_path(&self) -> &'static str {
+        match self {
+            Bullet::FromPlayer => "PlayerBullet.png",
+            Bullet::FromEnemy => "EnemyBullet.png",
+        }
+    }
+}
+
 pub fn create_bullet(
     In((origin, dir, bullet)): In<(Vec2, Vec2, Bullet)>,
     mut cmds: Commands,
@@ -35,7 +44,7 @@ pub fn create_bullet(
                 custom_size: Some(Vec2::new(28., 28.)),
                 ..Default::default()
             },
-            texture: assets.load("Electron.png"),
+            texture: assets.load(bullet.image_path()),
             transform: Transform::from_xyz(origin.x, origin.y, 1.),
             ..Default::default()
         },

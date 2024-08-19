@@ -19,6 +19,7 @@ mod energy;
 mod follow;
 mod health;
 mod molecule;
+mod powerup;
 mod wave;
 
 use bevy::{
@@ -89,6 +90,7 @@ fn main() {
         .add_plugins(health::plugin)
         .add_plugins(wave::plugin)
         .add_plugins(energy::plugin)
+        .add_plugins(powerup::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

@@ -36,12 +36,9 @@ pub fn wave_check_system(
                     max_speed: Some(rng.gen_range(15.0..20.0)),
                 },
                 Molecule {
-                    elements: vec![ElementInfo::Uranium],
+                    elements: vec![ElementInfo::Hydrogen],
                 },
-                Enemy::new(
-                    rng.gen_range(0.2..0.6),
-                    Duration::from_secs_f32(rng.gen_range(1.5..2.0)),
-                ),
+                Enemy::new(rng.gen_range(0.2..0.6)),
             ))
             .id();
 

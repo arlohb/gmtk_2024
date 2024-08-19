@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 
 use crate::{
@@ -40,6 +42,14 @@ impl ElementInfo {
         }
     }
 
+    pub fn firing_time(&self) -> f32 {
+        match self {
+            ElementInfo::Hydrogen => 1.,
+            ElementInfo::Iron => 1.,
+            ElementInfo::Uranium => 0.2,
+        }
+    }
+
     pub fn build(
         &self,
         parent: &mut ChildBuilder,
@@ -76,6 +86,8 @@ impl ElementInfo {
             HealthSprite,
         );
 
+        let shooter = Shooter::new(Duration::from_secs_f32(self.firing_time()));
+
         match self {
             ElementInfo::Hydrogen => parent
                 .spawn((
@@ -83,12 +95,19 @@ impl ElementInfo {
                     Atom,
                     Health::new(self.max_health()),
                     Hydrogen,
+                    shooter,
                 ))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
             ElementInfo::Iron => parent
-                .spawn((sprite_bundle, Atom, Health::new(self.max_health()), Iron))
+                .spawn((
+                    sprite_bundle,
+                    Atom,
+                    Health::new(self.max_health()),
+                    Iron,
+                    shooter,
+                ))
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
@@ -98,7 +117,7 @@ impl ElementInfo {
                     Atom,
                     Health::new(self.max_health()),
                     Uranium,
-                    Shooter,
+                    shooter,
                 ))
                 .with_children(|parent| {
                     parent.spawn(health);

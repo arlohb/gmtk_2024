@@ -1,7 +1,4 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
-use rand::Rng;
 
 use crate::{
     collision::{collision_system, CollisionEvent},
@@ -15,19 +12,11 @@ use crate::{
 #[derive(Component, Clone)]
 pub struct Enemy {
     pub speed: f32,
-    pub shoot_timer: Timer,
 }
 
 impl Enemy {
-    pub fn new(speed: f32, shoot_duration: Duration) -> Self {
-        let mut rng = rand::thread_rng();
-        let mut timer = Timer::new(shoot_duration, TimerMode::Repeating);
-        timer.tick(rng.gen_range(Duration::from_secs(0)..shoot_duration));
-
-        Self {
-            speed,
-            shoot_timer: timer,
-        }
+    pub fn new(speed: f32) -> Self {
+        Self { speed }
     }
 }
 
@@ -56,8 +45,8 @@ pub fn enemy_movement_system(
 
 pub fn enemy_shooting_system(
     time: Res<Time>,
-    mut enemies: Query<(Entity, &mut Enemy)>,
-    shooters: Query<(&GlobalTransform, &Parent), With<Shooter>>,
+    enemies: Query<(), With<Enemy>>,
+    mut shooters: Query<(&GlobalTransform, &Parent, &mut Shooter)>,
     players: Query<(&Transform, &Molecule), With<Player>>,
     create_bullet: Res<CreateBullet>,
     mut cmds: Commands,
@@ -69,20 +58,21 @@ pub fn enemy_shooting_system(
 
     let player_radius = player_molecule.collision_radius();
 
-    for (id, mut enemy) in &mut enemies {
-        if enemy.shoot_timer.tick(time.delta()).finished() {
-            for (shooter, _) in shooters.iter().filter(|(_, parent)| parent.get() == id) {
-                let origin = shooter.translation().xy();
-                let delta = target - origin;
+    for (shooter_trans, _, mut shooter) in shooters
+        .iter_mut()
+        .filter(|(_, parent, _)| enemies.contains(parent.get()))
+    {
+        if shooter.timer.tick(time.delta()).finished() {
+            let origin = shooter_trans.translation().xy();
+            let delta = target - origin;
 
-                if delta.length() >= 1200. + player_radius {
-                    continue;
-                }
-
-                let dir = delta.normalize();
-
-                cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromEnemy));
+            if delta.length() >= 1200. + player_radius {
+                continue;
             }
+
+            let dir = delta.normalize();
+
+            cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromEnemy));
         }
     }
 }

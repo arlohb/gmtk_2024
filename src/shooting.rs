@@ -1,4 +1,5 @@
 use bevy::{ecs::system::SystemId, prelude::*};
+use rand::Rng;
 use std::time::Duration;
 
 use crate::{
@@ -53,16 +54,29 @@ impl FromWorld for CreateBullet {
 }
 
 #[derive(Component)]
-pub struct Shooter;
+pub struct Shooter {
+    pub timer: Timer,
+}
+
+impl Shooter {
+    pub fn new(duration: Duration) -> Self {
+        let mut rng = rand::thread_rng();
+
+        let mut timer = Timer::new(duration, TimerMode::Repeating);
+        timer.tick(rng.gen_range(Duration::from_secs(0)..duration));
+
+        Self { timer }
+    }
+}
 
 fn player_shoot(
     create_bullet: Res<CreateBullet>,
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    shooters: Query<(&GlobalTransform, &Parent), With<Shooter>>,
+    mut shooters: Query<(&GlobalTransform, &Parent, &mut Shooter)>,
     players: Query<&Transform, With<Player>>,
-    mouse_btns: Res<ButtonInput<MouseButton>>,
     mut cmds: Commands,
+    time: Res<Time>,
 ) {
     let (camera, camera_transform) = cameras.single();
     let window = windows.single();
@@ -73,17 +87,21 @@ fn player_shoot(
         return;
     };
 
-    if mouse_btns.just_pressed(MouseButton::Left) {
-        for (shooter, parent) in &shooters {
-            let Ok(player) = players.get(parent.get()) else {
-                continue;
-            };
+    for (shooter_transform, parent, mut shooter) in &mut shooters {
+        shooter.timer.tick(time.delta());
 
-            let origin = shooter.translation().xy();
-            let dir = target - player.translation.xy();
+        let Ok(player) = players.get(parent.get()) else {
+            continue;
+        };
 
-            cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromPlayer));
+        if !shooter.timer.finished() {
+            continue;
         }
+
+        let origin = shooter_transform.translation().xy();
+        let dir = target - player.translation.xy();
+
+        cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromPlayer));
     }
 }
 

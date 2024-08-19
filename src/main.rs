@@ -1,4 +1,4 @@
-#![allow(clippy::type_complexity)]
+#![allow(clippy::type_complexity, clippy::too_many_arguments)]
 
 mod movement;
 pub use movement::*;

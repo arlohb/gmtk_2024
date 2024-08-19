@@ -22,7 +22,7 @@ pub fn spawn_powerup_system(
     assets: Res<AssetServer>,
     mut count: Local<u32>,
 ) {
-    let needed_energy = 20. + 1.2f32.powi(*count as i32);
+    let needed_energy = 20. + 1.5f32.powi(*count as i32);
 
     if energy.0 >= needed_energy {
         energy.0 = 0.;

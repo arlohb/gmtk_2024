@@ -1,10 +1,18 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-use crate::{energy::Energy, Player};
+use crate::{
+    collision::{collision_system, CollisionEvent},
+    elements::ElementInfo,
+    energy::Energy,
+    molecule::BuildMolecule,
+    Player,
+};
 
-#[derive(Component)]
-pub struct Powerup;
+#[derive(Component, Clone)]
+pub enum Powerup {
+    AddAtom(ElementInfo),
+}
 
 pub fn spawn_powerup_system(
     mut cmds: Commands,
@@ -24,6 +32,12 @@ pub fn spawn_powerup_system(
         let x = rng.gen_range(-1000.0..1000.0);
         let y = rng.gen_range(-1000.0..1000.0);
 
+        let element = {
+            let all = ElementInfo::all();
+            let index = rng.gen_range(0..all.len());
+            all[index]
+        };
+
         cmds.spawn((
             SpriteBundle {
                 sprite: Sprite {
@@ -32,10 +46,10 @@ pub fn spawn_powerup_system(
                     ..Default::default()
                 },
                 transform: Transform::from_xyz(center.x + x, center.y + y, 0.),
-                texture: assets.load("ElementU.png"),
+                texture: assets.load(element.image_path()),
                 ..Default::default()
             },
-            Powerup,
+            Powerup::AddAtom(element),
         ));
     }
 }
@@ -132,8 +146,34 @@ pub fn powerup_arrow_system(
     arrow_transform.rotation = Quat::from_rotation_z(rotation);
 }
 
+pub fn powerup_player_collision_system(
+    mut events: EventReader<CollisionEvent<Powerup, Player>>,
+    mut build_molecule_event: EventWriter<BuildMolecule>,
+    mut cmds: Commands,
+) {
+    for event in events.read() {
+        match event.a_comp {
+            Powerup::AddAtom(element) => build_molecule_event.send(BuildMolecule::Add {
+                target: event.b_id,
+                element,
+            }),
+        };
+
+        cmds.entity(event.a_id).despawn();
+    }
+}
+
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, setup_powerup_arrow)
+    app.add_event::<CollisionEvent<Powerup, Player>>()
+        .add_systems(Startup, setup_powerup_arrow)
         .add_systems(Update, spawn_powerup_system)
-        .add_systems(Update, powerup_arrow_system);
+        .add_systems(Update, powerup_arrow_system)
+        .add_systems(
+            Update,
+            (
+                collision_system::<Powerup, Player>,
+                powerup_player_collision_system,
+            )
+                .chain(),
+        );
 }

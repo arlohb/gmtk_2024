@@ -16,6 +16,14 @@ pub enum ElementInfo {
 }
 
 impl ElementInfo {
+    pub fn all() -> [ElementInfo; 3] {
+        [
+            ElementInfo::Hydrogen,
+            ElementInfo::Iron,
+            ElementInfo::Uranium,
+        ]
+    }
+
     pub fn image_path(&self) -> &'static str {
         match self {
             ElementInfo::Hydrogen => "ElementH.png",

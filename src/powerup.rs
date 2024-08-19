@@ -65,13 +65,14 @@ pub fn setup_powerup_arrow(mut cmds: Commands, assets: Res<AssetServer>) {
 }
 
 pub fn powerup_arrow_system(
-    powerups: Query<(&Transform, &ViewVisibility), With<Powerup>>,
-    players: Query<&Transform, With<Player>>,
-    mut arrows: Query<(&mut Style, &mut UiImage), With<PowerupArrow>>,
+    powerups: Query<(&Transform, &ViewVisibility), (With<Powerup>, Without<PowerupArrow>)>,
+    players: Query<&Transform, (With<Player>, Without<PowerupArrow>)>,
+    mut arrows: Query<(&mut Transform, &mut Style, &mut UiImage), With<PowerupArrow>>,
     windows: Query<&Window>,
     mut last_delta: Local<Vec2>,
 ) {
-    let Ok((mut arrow_style, mut arrow_image)) = arrows.get_single_mut() else {
+    let Ok((mut arrow_transform, mut arrow_style, mut arrow_image)) = arrows.get_single_mut()
+    else {
         return;
     };
 
@@ -126,6 +127,9 @@ pub fn powerup_arrow_system(
 
     arrow_style.left = Val::Px(screen_coords.x);
     arrow_style.top = Val::Px(screen_coords.y);
+
+    let rotation = delta.x.atan2(delta.y);
+    arrow_transform.rotation = Quat::from_rotation_z(rotation);
 }
 
 pub fn plugin(app: &mut App) {

@@ -82,7 +82,7 @@ bevy = { version = "0.14", default-features = false, features = [
     # "basis-universal", # Basis Universal GPU texture compression format
     # "zlib", # zlib compression support in KTX2 files
     # "flac", # Audio: FLAC lossless format
-    # "mp3",  # Audio: MP3 format (not recommended)
+    "mp3",  # Audio: MP3 format (not recommended)
     # "wav",  # Audio: Uncompressed WAV
     # "symphonia-all", # All Audio formats supported by the Symphonia library
     # "shader_format_glsl", # GLSL shader support

@@ -27,6 +27,7 @@ mod wave;
 
 use bevy::{
     asset::AssetMetaCheck,
+    audio::PlaybackMode,
     ecs::schedule::{LogLevel, ScheduleBuildSettings},
     prelude::*,
     render::texture::{
@@ -57,6 +58,16 @@ fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
         texture,
         transform: Transform::from_xyz(0., 0., -1.).with_scale(Vec3::new(4., 4., 1.)),
         ..Default::default()
+    });
+}
+
+fn setup_music(mut cmds: Commands, assets: Res<AssetServer>) {
+    cmds.spawn(AudioBundle {
+        source: assets.load("music.mp3"),
+        settings: PlaybackSettings {
+            mode: PlaybackMode::Loop,
+            ..Default::default()
+        },
     });
 }
 
@@ -96,6 +107,6 @@ fn main() {
         .add_plugins(powerup::plugin)
         .add_plugins(timer::plugin)
         .add_plugins(state::plugin)
-        .add_systems(Startup, create_background)
+        .add_systems(Startup, (create_background, setup_music))
         .run();
 }

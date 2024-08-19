@@ -89,7 +89,7 @@ pub fn update_cursor(mut cursors: Query<&mut Style, With<Cursor>>, windows: Quer
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, (setup_camera, setup_cursor))
+    app.add_systems(Startup, setup_camera)
         .add_systems(
             FixedPostUpdate,
             follow_system::<MainCamera, Player, 10>.after(velocity::apply_velocity),

@@ -5,6 +5,7 @@ use crate::{
     elements::ElementInfo,
     enemy::Enemy,
     molecule::{build_molecules_system, BuildMolecule, Molecule},
+    state::GameState,
     utils::random_in_donut,
     Player, Velocity,
 };
@@ -20,7 +21,10 @@ pub fn wave_check_system(
     }
 
     let mut rng = rand::thread_rng();
-    let player = players.single().translation;
+    let Ok(player) = players.get_single() else {
+        return;
+    };
+    let player = player.translation;
 
     for _ in 0..20 {
         let id = cmds
@@ -45,5 +49,10 @@ pub fn wave_check_system(
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Update, wave_check_system.before(build_molecules_system));
+    app.add_systems(
+        Update,
+        wave_check_system
+            .before(build_molecules_system)
+            .run_if(in_state(GameState::Playing)),
+    );
 }

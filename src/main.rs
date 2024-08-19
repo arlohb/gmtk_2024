@@ -20,6 +20,7 @@ mod follow;
 mod health;
 mod molecule;
 mod powerup;
+mod state;
 mod timer;
 mod utils;
 mod wave;
@@ -94,6 +95,7 @@ fn main() {
         .add_plugins(energy::plugin)
         .add_plugins(powerup::plugin)
         .add_plugins(timer::plugin)
+        .add_plugins(state::plugin)
         .add_systems(Startup, create_background)
         .run();
 }

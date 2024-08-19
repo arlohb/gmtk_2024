@@ -20,9 +20,13 @@ pub fn spawn_powerup_system(
     players: Query<&Transform, With<Player>>,
     mut energy: ResMut<Energy>,
     assets: Res<AssetServer>,
+    mut count: Local<u32>,
 ) {
-    if energy.0 >= 100. {
+    let needed_energy = 20. + 1.2f32.powi(*count as i32);
+
+    if energy.0 >= needed_energy {
         energy.0 = 0.;
+        *count += 1;
 
         let Ok(player) = players.get_single() else {
             return;

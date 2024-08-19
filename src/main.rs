@@ -20,6 +20,7 @@ mod follow;
 mod health;
 mod molecule;
 mod powerup;
+mod utils;
 mod wave;
 
 use bevy::{

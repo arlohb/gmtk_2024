@@ -6,6 +6,7 @@ use crate::{
     elements::ElementInfo,
     energy::Energy,
     molecule::BuildMolecule,
+    utils::random_in_donut,
     Player,
 };
 
@@ -28,11 +29,8 @@ pub fn spawn_powerup_system(
         };
         let center = player.translation.xy();
 
-        let mut rng = rand::thread_rng();
-        let x = rng.gen_range(-1000.0..1000.0);
-        let y = rng.gen_range(-1000.0..1000.0);
-
         let element = {
+            let mut rng = rand::thread_rng();
             let all = ElementInfo::all();
             let index = rng.gen_range(0..all.len());
             all[index]
@@ -45,7 +43,9 @@ pub fn spawn_powerup_system(
                     custom_size: Some(Vec2::new(64., 64.)),
                     ..Default::default()
                 },
-                transform: Transform::from_xyz(center.x + x, center.y + y, 0.),
+                transform: Transform::from_translation(
+                    (center + random_in_donut(600., 2000.)).extend(0.),
+                ),
                 texture: assets.load(element.image_path()),
                 ..Default::default()
             },

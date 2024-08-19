@@ -5,6 +5,7 @@ use crate::{
     elements::ElementInfo,
     enemy::Enemy,
     molecule::{build_molecules_system, BuildMolecule, Molecule},
+    utils::random_in_donut,
     Player, Velocity,
 };
 
@@ -24,15 +25,13 @@ pub fn wave_check_system(
     for _ in 0..20 {
         let id = cmds
             .spawn((
-                SpatialBundle::from_transform(Transform::from_xyz(
-                    player.x + rng.gen_range(-1000.0..1000.0),
-                    player.y + rng.gen_range(-1000.0..1000.0),
-                    0.,
+                SpatialBundle::from_transform(Transform::from_translation(
+                    (player.xy() + random_in_donut(2000., 6000.)).extend(0.),
                 )),
                 Velocity {
                     velocity: Vec3::ZERO,
                     drag: rng.gen_range(0.025..0.055),
-                    max_speed: Some(rng.gen_range(30.0..70.0)),
+                    max_speed: Some(rng.gen_range(15.0..20.0)),
                 },
                 Molecule {
                     elements: vec![ElementInfo::Uranium],

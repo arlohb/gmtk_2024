@@ -117,7 +117,9 @@ pub fn build_molecules_system(
                     }
 
                     molecule.elements.remove(index);
-                    cmds.entity(atom).remove_parent().despawn();
+                    let mut atom_cmds = cmds.entity(atom);
+                    atom_cmds.remove_parent();
+                    atom_cmds.despawn_recursive();
 
                     let offsets = create_polygon(molecule.elements.len());
 

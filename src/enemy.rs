@@ -1,15 +1,34 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
+use rand::Rng;
 
 use crate::{
     collision::{collision_system, CollisionEvent},
     elements::Atom,
     health::Health,
+    molecule::Molecule,
+    shooting::{Bullet, CreateBullet, Shooter},
     Player, Velocity,
 };
 
 #[derive(Component, Clone)]
 pub struct Enemy {
     pub speed: f32,
+    pub shoot_timer: Timer,
+}
+
+impl Enemy {
+    pub fn new(speed: f32, shoot_duration: Duration) -> Self {
+        let mut rng = rand::thread_rng();
+        let mut timer = Timer::new(shoot_duration, TimerMode::Repeating);
+        timer.tick(rng.gen_range(Duration::from_secs(0)..shoot_duration));
+
+        Self {
+            speed,
+            shoot_timer: timer,
+        }
+    }
 }
 
 pub fn enemy_movement_system(
@@ -21,7 +40,7 @@ pub fn enemy_movement_system(
     };
     let player = player.translation.xy();
 
-    for (mut velocity, origin, &Enemy { speed }) in &mut enemies {
+    for (mut velocity, origin, &Enemy { speed, .. }) in &mut enemies {
         let offset = player - origin.translation.xy();
 
         if offset.length() <= 0.0001 {
@@ -32,6 +51,39 @@ pub fn enemy_movement_system(
         let accel = speed * dir;
 
         velocity.velocity += Vec3::new(accel.x, accel.y, 0.);
+    }
+}
+
+pub fn enemy_shooting_system(
+    time: Res<Time>,
+    mut enemies: Query<(Entity, &mut Enemy)>,
+    shooters: Query<(&GlobalTransform, &Parent), With<Shooter>>,
+    players: Query<(&Transform, &Molecule), With<Player>>,
+    create_bullet: Res<CreateBullet>,
+    mut cmds: Commands,
+) {
+    let Ok((player, player_molecule)) = players.get_single() else {
+        return;
+    };
+    let target = player.translation.xy();
+
+    let player_radius = player_molecule.collision_radius();
+
+    for (id, mut enemy) in &mut enemies {
+        if enemy.shoot_timer.tick(time.delta()).finished() {
+            for (shooter, _) in shooters.iter().filter(|(_, parent)| parent.get() == id) {
+                let origin = shooter.translation().xy();
+                let delta = target - origin;
+
+                if delta.length() >= 1200. + player_radius {
+                    continue;
+                }
+
+                let dir = delta.normalize();
+
+                cmds.run_system_with_input(create_bullet.0, (origin, dir, Bullet::FromEnemy));
+            }
+        }
     }
 }
 
@@ -126,5 +178,6 @@ pub fn plugin(app: &mut App) {
                 enemy_player_collision_system,
             )
                 .chain(),
-        );
+        )
+        .add_systems(Update, enemy_shooting_system);
 }

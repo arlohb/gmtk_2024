@@ -44,7 +44,7 @@ pub fn create_bullet(
 }
 
 #[derive(Resource)]
-pub struct CreateBullet(SystemId<(Vec2, Vec2, Bullet)>);
+pub struct CreateBullet(pub SystemId<(Vec2, Vec2, Bullet)>);
 
 impl FromWorld for CreateBullet {
     fn from_world(world: &mut World) -> Self {

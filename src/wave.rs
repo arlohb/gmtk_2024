@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use rand::Rng;
 
@@ -36,9 +38,10 @@ pub fn wave_check_system(
                 Molecule {
                     elements: vec![ElementInfo::Uranium],
                 },
-                Enemy {
-                    speed: rng.gen_range(0.2..0.6),
-                },
+                Enemy::new(
+                    rng.gen_range(0.2..0.6),
+                    Duration::from_secs_f32(rng.gen_range(1.5..2.0)),
+                ),
             ))
             .id();
 

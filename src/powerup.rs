@@ -6,6 +6,7 @@ use crate::{
     elements::ElementInfo,
     energy::Energy,
     molecule::BuildMolecule,
+    state::GameState,
     utils::random_in_donut,
     Player,
 };
@@ -15,18 +16,25 @@ pub enum Powerup {
     AddAtom(ElementInfo),
 }
 
+#[derive(Resource, Default)]
+pub struct PowerupCount(usize);
+
+pub fn reset_powerup_count(mut count: ResMut<PowerupCount>) {
+    count.0 = 0;
+}
+
 pub fn spawn_powerup_system(
     mut cmds: Commands,
     players: Query<&Transform, With<Player>>,
     mut energy: ResMut<Energy>,
     assets: Res<AssetServer>,
-    mut count: Local<u32>,
+    mut count: ResMut<PowerupCount>,
 ) {
-    let needed_energy = 20. + 1.5f32.powi(*count as i32);
+    let needed_energy = 20. + 40. * (count.0 as f32);
 
     if energy.0 >= needed_energy {
         energy.0 = 0.;
-        *count += 1;
+        count.0 += 1;
 
         let Ok(player) = players.get_single() else {
             return;
@@ -35,7 +43,7 @@ pub fn spawn_powerup_system(
 
         let element = {
             let mut rng = rand::thread_rng();
-            let all = ElementInfo::all();
+            let all = [ElementInfo::Iron, ElementInfo::Uranium];
             let index = rng.gen_range(0..all.len());
             all[index]
         };
@@ -170,6 +178,8 @@ pub fn powerup_player_collision_system(
 
 pub fn plugin(app: &mut App) {
     app.add_event::<CollisionEvent<Powerup, Player>>()
+        .init_resource::<PowerupCount>()
+        .add_systems(OnEnter(GameState::Playing), reset_powerup_count)
         .add_systems(Startup, setup_powerup_arrow)
         .add_systems(Update, spawn_powerup_system)
         .add_systems(Update, powerup_arrow_system)

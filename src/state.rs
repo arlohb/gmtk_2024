@@ -5,6 +5,7 @@ use crate::{
     enemy::Enemy,
     energy::reset_energy,
     shooting::Bullet,
+    timer::death_enter_system,
 };
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -33,5 +34,6 @@ pub fn cleanup_system(
 pub fn plugin(app: &mut App) {
     app.init_state::<GameState>()
         .add_systems(OnEnter(GameState::Playing), (setup_cursor, reset_energy))
-        .add_systems(OnExit(GameState::Playing), cleanup_system);
+        .add_systems(OnExit(GameState::Playing), cleanup_system)
+        .add_systems(OnEnter(GameState::Death), death_enter_system);
 }

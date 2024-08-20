@@ -30,7 +30,7 @@ pub fn spawn_powerup_system(
     assets: Res<AssetServer>,
     mut count: ResMut<PowerupCount>,
 ) {
-    let needed_energy = 20. + 40. * (count.0 as f32);
+    let needed_energy = 20. + 30. * (count.0 as f32).sqrt();
 
     if energy.0 >= needed_energy {
         energy.0 = 0.;
@@ -43,7 +43,11 @@ pub fn spawn_powerup_system(
 
         let element = {
             let mut rng = rand::thread_rng();
-            let all = [ElementInfo::Iron, ElementInfo::Uranium];
+            let all = [
+                ElementInfo::Iron,
+                ElementInfo::Thorium,
+                ElementInfo::Thorium,
+            ];
             let index = rng.gen_range(0..all.len());
             all[index]
         };

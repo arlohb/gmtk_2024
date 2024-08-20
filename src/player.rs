@@ -25,7 +25,7 @@ pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<B
             },
             Player,
             Molecule {
-                elements: vec![ElementInfo::Uranium],
+                elements: vec![ElementInfo::Thorium],
             },
         ))
         .id();

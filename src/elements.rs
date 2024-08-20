@@ -15,22 +15,16 @@ pub enum ElementInfo {
     Hydrogen,
     Iron,
     Uranium,
+    Thorium,
 }
 
 impl ElementInfo {
-    pub fn all() -> [ElementInfo; 3] {
-        [
-            ElementInfo::Hydrogen,
-            ElementInfo::Iron,
-            ElementInfo::Uranium,
-        ]
-    }
-
     pub fn image_path(&self) -> &'static str {
         match self {
             ElementInfo::Hydrogen => "ElementH.png",
             ElementInfo::Iron => "ElementFe.png",
             ElementInfo::Uranium => "ElementU.png",
+            ElementInfo::Thorium => "ElementTh.png",
         }
     }
 
@@ -39,6 +33,7 @@ impl ElementInfo {
             ElementInfo::Hydrogen => 100.,
             ElementInfo::Iron => 300.,
             ElementInfo::Uranium => 100.,
+            ElementInfo::Thorium => 200.,
         }
     }
 
@@ -46,7 +41,8 @@ impl ElementInfo {
         match self {
             ElementInfo::Hydrogen => 1.,
             ElementInfo::Iron => 1.,
-            ElementInfo::Uranium => 0.2,
+            ElementInfo::Uranium => 0.5,
+            ElementInfo::Thorium => 0.2,
         }
     }
 
@@ -122,6 +118,17 @@ impl ElementInfo {
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
+            ElementInfo::Thorium => parent
+                .spawn((
+                    sprite_bundle,
+                    Atom,
+                    Health::new(self.max_health()),
+                    Thorium,
+                    shooter,
+                ))
+                .with_children(|parent| {
+                    parent.spawn(health);
+                }),
         };
     }
 }
@@ -134,3 +141,6 @@ pub struct Iron;
 
 #[derive(Component)]
 pub struct Uranium;
+
+#[derive(Component)]
+pub struct Thorium;

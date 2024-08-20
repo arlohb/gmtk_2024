@@ -10,7 +10,6 @@ mod time_to_live;
 pub use time_to_live::TimeToLive;
 mod player;
 mod shooting;
-mod shop;
 pub use player::Player;
 mod collision;
 mod death;
@@ -99,7 +98,6 @@ fn main() {
         .add_plugins(velocity::plugin)
         .add_plugins(movement::plugin)
         .add_plugins(shooting::plugin)
-        .add_plugins(shop::plugin)
         .add_plugins(player::plugin)
         .add_plugins(molecule::plugin)
         .add_plugins(enemy::plugin)

@@ -37,7 +37,7 @@ pub fn setup_timer(mut cmds: Commands) {
     cmds.spawn((
         TextBundle {
             style: Style {
-                top: Val::Percent(10.),
+                top: Val::Percent(5.),
                 justify_self: JustifySelf::Center,
                 ..Default::default()
             },
@@ -46,14 +46,14 @@ pub fn setup_timer(mut cmds: Commands) {
                     TextSection::new(
                         "".to_string(),
                         TextStyle {
-                            font_size: 64.,
+                            font_size: 48.,
                             ..Default::default()
                         },
                     ),
                     TextSection::new(
                         "".to_string(),
                         TextStyle {
-                            font_size: 48.,
+                            font_size: 32.,
                             ..Default::default()
                         },
                     ),

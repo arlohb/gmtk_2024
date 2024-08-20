@@ -30,14 +30,15 @@ pub fn wave_check_system(
 
     count.0 += 1;
     let count = count.0;
-    let (enemy_count, types, size_range) = match count {
-        count if count <= 3 => (count * 4, vec![ElementInfo::Hydrogen], 1..=1),
+    let (enemy_count, types, size_range, speed_range) = match count {
+        count if count <= 3 => (count * 4, vec![ElementInfo::Hydrogen], 1..=1, 16.0..17.0),
         count if count <= 6 => (
             count * 3,
             vec![ElementInfo::Hydrogen, ElementInfo::Uranium],
             1..=2,
+            16.0..20.0,
         ),
-        count if count <= 10 => (
+        count if count <= 9 => (
             count * 2,
             vec![
                 ElementInfo::Iron,
@@ -45,15 +46,28 @@ pub fn wave_check_system(
                 ElementInfo::Thorium,
             ],
             1..=3,
+            18.0..22.0,
+        ),
+        count if count <= 12 => (
+            count * 2,
+            vec![
+                ElementInfo::Iron,
+                ElementInfo::Iron,
+                ElementInfo::Uranium,
+                ElementInfo::Thorium,
+            ],
+            2..=5,
+            18.0..24.0,
         ),
         _ => (
-            count,
+            count * 2,
             vec![
                 ElementInfo::Iron,
                 ElementInfo::Uranium,
                 ElementInfo::Thorium,
             ],
-            2..=4,
+            2..=6,
+            18.0..24.0,
         ),
     };
 
@@ -78,10 +92,10 @@ pub fn wave_check_system(
                 Velocity {
                     velocity: Vec3::ZERO,
                     drag: rng.gen_range(0.025..0.055),
-                    max_speed: Some(rng.gen_range(15.0..20.0)),
+                    max_speed: Some(rng.gen_range(speed_range.clone())),
                 },
                 Molecule { elements },
-                Enemy::new(rng.gen_range(0.2..0.6)),
+                Enemy::new(rng.gen_range(0.5..1.0)),
             ))
             .id();
 

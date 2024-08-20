@@ -5,8 +5,7 @@ use crate::{
     collision::{collision_system, CollisionEvent},
     elements::ElementInfo,
     energy::Energy,
-    molecule::BuildMolecule,
-    state::GameState,
+    molecule::{BuildMolecule, Molecule},
     utils::random_in_donut,
     Player,
 };
@@ -16,34 +15,26 @@ pub enum Powerup {
     AddAtom(ElementInfo),
 }
 
-#[derive(Resource, Default)]
-pub struct PowerupCount(usize);
-
-pub fn reset_powerup_count(mut count: ResMut<PowerupCount>) {
-    count.0 = 0;
-}
-
 pub fn spawn_powerup_system(
     mut cmds: Commands,
-    players: Query<&Transform, With<Player>>,
+    players: Query<(&Transform, &Molecule), With<Player>>,
     mut energy: ResMut<Energy>,
     assets: Res<AssetServer>,
-    mut count: ResMut<PowerupCount>,
 ) {
-    let needed_energy = 20. + 30. * (count.0 as f32).sqrt();
+    let Ok((player, molecule)) = players.get_single() else {
+        return;
+    };
+    let center = player.translation.xy();
+
+    let player_size = molecule.elements.len();
+    let needed_energy = -30. + 50. * (player_size as f32).sqrt();
 
     if energy.0 >= needed_energy {
-        energy.0 = 0.;
-        count.0 += 1;
-
-        let Ok(player) = players.get_single() else {
-            return;
-        };
-        let center = player.translation.xy();
+        energy.0 -= needed_energy;
 
         let element = {
             let mut rng = rand::thread_rng();
-            let all = match count.0 {
+            let all = match player_size {
                 count if count <= 3 => vec![
                     ElementInfo::Iron,
                     ElementInfo::Thorium,
@@ -193,8 +184,6 @@ pub fn powerup_player_collision_system(
 
 pub fn plugin(app: &mut App) {
     app.add_event::<CollisionEvent<Powerup, Player>>()
-        .init_resource::<PowerupCount>()
-        .add_systems(OnEnter(GameState::Playing), reset_powerup_count)
         .add_systems(Startup, setup_powerup_arrow)
         .add_systems(Update, spawn_powerup_system)
         .add_systems(Update, powerup_arrow_system)

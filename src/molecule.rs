@@ -105,7 +105,7 @@ pub fn build_molecules_system(
                     return;
                 };
 
-                if let Some((index, _)) = old_children
+                if let Some((mut index, _)) = old_children
                     .iter()
                     .enumerate()
                     .find(|(_, child)| **child == atom)
@@ -114,6 +114,11 @@ pub fn build_molecules_system(
                     if molecule.elements.len() == 1 {
                         cmds.entity(entity).despawn_recursive();
                         continue;
+                    }
+
+                    // If removal is invalid
+                    if index >= molecule.elements.len() {
+                        index = molecule.elements.len() - 1;
                     }
 
                     molecule.elements.remove(index);
@@ -125,7 +130,9 @@ pub fn build_molecules_system(
 
                     for (i, child) in old_children.iter().enumerate().filter(|(i, _)| *i != index) {
                         let pos = &mut child_transforms.get_mut(*child).unwrap().translation;
-                        let offset = offsets[if i > index { i - 1 } else { i }];
+                        let offset = offsets
+                            .get(if i > index { i - 1 } else { i })
+                            .unwrap_or_else(|| &offsets[offsets.len() - 1]);
                         pos.x = offset.x;
                         pos.y = offset.y;
                     }

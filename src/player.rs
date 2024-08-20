@@ -16,7 +16,7 @@ pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<B
             SpatialBundle::default(),
             Movement {
                 acceleration: 1.,
-                max_velocity: 15.,
+                max_velocity: 20.,
             },
             Velocity {
                 velocity: Vec3::ZERO,

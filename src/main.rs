@@ -74,6 +74,8 @@ fn setup_music(mut cmds: Commands, assets: Res<AssetServer>) {
 }
 
 fn main() {
+    std::env::set_var("RUST_BACKTRACE", "1");
+
     App::new()
         // Enable ambiguity detection
         // Have to ignore the warning for time_system and event_update_system

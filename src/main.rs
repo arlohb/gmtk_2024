@@ -34,6 +34,7 @@ use bevy::{
     render::texture::{
         ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor,
     },
+    window::WindowMode,
 };
 
 fn create_background(mut cmds: Commands, assets: ResMut<AssetServer>) {
@@ -94,6 +95,15 @@ fn main() {
                 })
                 .set(ImagePlugin {
                     default_sampler: ImageSamplerDescriptor::nearest(),
+                })
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        resizable: false,
+                        mode: WindowMode::BorderlessFullscreen,
+                        fit_canvas_to_parent: true,
+                        ..Default::default()
+                    }),
+                    ..Default::default()
                 }),
         )
         .add_plugins(camera::plugin)

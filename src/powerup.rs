@@ -67,8 +67,8 @@ pub fn setup_powerup_arrow(mut cmds: Commands, assets: Res<AssetServer>) {
             style: Style {
                 left: Val::Percent(50.),
                 top: Val::Px(0.),
-                width: Val::Px(64.),
-                height: Val::Px(64.),
+                width: Val::Px(128.),
+                height: Val::Px(128.),
                 ..Default::default()
             },
             image: UiImage {
@@ -104,8 +104,8 @@ pub fn powerup_arrow_system(
         return;
     };
 
-    let image_padding = 32.;
-    let padding = 32.;
+    let image_padding = 64.;
+    let padding = 64.;
 
     let width = window.width() - image_padding * 2. - padding * 2.;
     let height = window.height() - image_padding * 2. - padding * 2.;

@@ -17,9 +17,21 @@ pub enum GameState {
     Death,
 }
 
+#[derive(Component)]
+pub struct PlayingCleanup;
+
 pub fn cleanup_system(
     mut cmds: Commands,
-    entities: Query<Entity, Or<(With<Enemy>, With<Bullet>, With<Cursor>, With<Powerup>)>>,
+    entities: Query<
+        Entity,
+        Or<(
+            With<Enemy>,
+            With<Bullet>,
+            With<Cursor>,
+            With<Powerup>,
+            With<PlayingCleanup>,
+        )>,
+    >,
     mut windows: Query<&mut Window>,
 ) {
     let Ok(mut window) = windows.get_single_mut() else {

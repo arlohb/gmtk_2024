@@ -30,7 +30,7 @@ pub fn setup_menu(mut cmds: Commands) {
             },
             text: Text {
                 sections: vec![TextSection::new(
-                    "Game Title Here",
+                    "Atomic Warfare",
                     TextStyle {
                         font_size: 64.,
                         ..Default::default()

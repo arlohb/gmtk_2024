@@ -19,6 +19,7 @@ mod enemy;
 mod energy;
 mod follow;
 mod health;
+mod menu;
 mod molecule;
 mod powerup;
 mod state;
@@ -109,6 +110,7 @@ fn main() {
         .add_plugins(timer::plugin)
         .add_plugins(state::plugin)
         .add_plugins(death::plugin)
+        .add_plugins(menu::plugin)
         .add_systems(Startup, (create_background, setup_music))
         .run();
 }

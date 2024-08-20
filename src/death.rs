@@ -6,6 +6,9 @@ use crate::{state::GameState, timer::GameTimer};
 pub struct RespawnButton;
 
 #[derive(Component)]
+pub struct MenuButton;
+
+#[derive(Component)]
 pub struct DeathCleanup;
 
 pub fn death_enter_system(mut cmds: Commands, timer: Res<GameTimer>) {
@@ -53,7 +56,7 @@ pub fn death_enter_system(mut cmds: Commands, timer: Res<GameTimer>) {
                 ButtonBundle {
                     style: Style {
                         padding: UiRect::all(Val::Px(16.)),
-                        margin: UiRect::top(Val::Px(64.)),
+                        margin: UiRect::top(Val::Vh(20.)),
                         justify_content: JustifyContent::Center,
                         ..Default::default()
                     },
@@ -78,10 +81,41 @@ pub fn death_enter_system(mut cmds: Commands, timer: Res<GameTimer>) {
                     ..Default::default()
                 });
             });
+
+        parent
+            .spawn((
+                ButtonBundle {
+                    style: Style {
+                        padding: UiRect::all(Val::Px(16.)),
+                        margin: UiRect::top(Val::Px(24.)),
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
+                    background_color: BackgroundColor(Color::linear_rgb(0.2, 0.2, 0.2)),
+                    ..Default::default()
+                },
+                MenuButton,
+            ))
+            .with_children(|button| {
+                button.spawn(TextBundle {
+                    text: Text {
+                        sections: vec![TextSection::new(
+                            "Menu",
+                            TextStyle {
+                                font_size: 64.,
+                                ..Default::default()
+                            },
+                        )],
+                        justify: JustifyText::Center,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                });
+            });
     });
 }
 
-pub fn respawn_system(
+pub fn respawn_button_system(
     interactions: Query<&Interaction, (With<RespawnButton>, Changed<Interaction>)>,
     mut next_state: ResMut<NextState<GameState>>,
 ) {
@@ -92,12 +126,30 @@ pub fn respawn_system(
     }
 }
 
+pub fn menu_button_system(
+    interactions: Query<&Interaction, (With<MenuButton>, Changed<Interaction>)>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    for interaction in &interactions {
+        if let Interaction::Pressed = interaction {
+            next_state.set(GameState::Menu);
+        }
+    }
+}
+
 pub fn death_cleanup_system(mut cmds: Commands, entities: Query<Entity, With<DeathCleanup>>) {
     let mut despawn = |entity| cmds.entity(entity).despawn_recursive();
     entities.iter().for_each(&mut despawn);
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Update, respawn_system.run_if(in_state(GameState::Death)))
-        .add_systems(OnExit(GameState::Death), death_cleanup_system);
+    app.add_systems(
+        Update,
+        respawn_button_system.run_if(in_state(GameState::Death)),
+    )
+    .add_systems(
+        Update,
+        menu_button_system.run_if(in_state(GameState::Death)),
+    )
+    .add_systems(OnExit(GameState::Death), death_cleanup_system);
 }

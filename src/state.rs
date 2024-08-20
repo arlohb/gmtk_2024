@@ -11,8 +11,8 @@ use crate::{
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub enum GameState {
-    Menu,
     #[default]
+    Menu,
     Playing,
     Death,
 }

@@ -95,6 +95,7 @@ pub fn powerup_arrow_system(
     };
 
     let Ok(player) = players.get_single() else {
+        arrow_image.color.set_alpha(0.);
         return;
     };
     let player = player.translation.xy();

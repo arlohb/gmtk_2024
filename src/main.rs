@@ -28,7 +28,7 @@ mod wave;
 
 use bevy::{
     asset::AssetMetaCheck,
-    audio::PlaybackMode,
+    audio::{PlaybackMode, Volume},
     ecs::schedule::{LogLevel, ScheduleBuildSettings},
     prelude::*,
     render::texture::{
@@ -67,6 +67,7 @@ fn setup_music(mut cmds: Commands, assets: Res<AssetServer>) {
         source: assets.load("music.mp3"),
         settings: PlaybackSettings {
             mode: PlaybackMode::Loop,
+            volume: Volume::new(0.3),
             ..Default::default()
         },
     });

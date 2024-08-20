@@ -43,11 +43,22 @@ pub fn spawn_powerup_system(
 
         let element = {
             let mut rng = rand::thread_rng();
-            let all = [
-                ElementInfo::Iron,
-                ElementInfo::Thorium,
-                ElementInfo::Thorium,
-            ];
+            let all = match count.0 {
+                count if count <= 3 => vec![
+                    ElementInfo::Iron,
+                    ElementInfo::Thorium,
+                    ElementInfo::Thorium,
+                ],
+                count if count <= 6 => {
+                    vec![ElementInfo::Iron, ElementInfo::Thorium, ElementInfo::Radium]
+                }
+                _ => vec![
+                    ElementInfo::Iron,
+                    ElementInfo::Thorium,
+                    ElementInfo::Radium,
+                    ElementInfo::Radium,
+                ],
+            };
             let index = rng.gen_range(0..all.len());
             all[index]
         };

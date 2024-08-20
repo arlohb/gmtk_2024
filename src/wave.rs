@@ -39,10 +39,22 @@ pub fn wave_check_system(
         ),
         count if count <= 10 => (
             count * 2,
-            vec![ElementInfo::Iron, ElementInfo::Uranium],
+            vec![
+                ElementInfo::Iron,
+                ElementInfo::Uranium,
+                ElementInfo::Thorium,
+            ],
             1..=3,
         ),
-        _ => (count, vec![ElementInfo::Iron, ElementInfo::Uranium], 2..=4),
+        _ => (
+            count,
+            vec![
+                ElementInfo::Iron,
+                ElementInfo::Uranium,
+                ElementInfo::Thorium,
+            ],
+            2..=4,
+        ),
     };
 
     let mut rng = rand::thread_rng();

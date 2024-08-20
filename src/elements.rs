@@ -16,6 +16,7 @@ pub enum ElementInfo {
     Iron,
     Uranium,
     Thorium,
+    Radium,
 }
 
 impl ElementInfo {
@@ -25,6 +26,7 @@ impl ElementInfo {
             ElementInfo::Iron => "ElementFe.png",
             ElementInfo::Uranium => "ElementU.png",
             ElementInfo::Thorium => "ElementTh.png",
+            ElementInfo::Radium => "ElementRa.png",
         }
     }
 
@@ -34,6 +36,7 @@ impl ElementInfo {
             ElementInfo::Iron => 300.,
             ElementInfo::Uranium => 100.,
             ElementInfo::Thorium => 200.,
+            ElementInfo::Radium => 300.,
         }
     }
 
@@ -43,6 +46,7 @@ impl ElementInfo {
             ElementInfo::Iron => 1.,
             ElementInfo::Uranium => 0.5,
             ElementInfo::Thorium => 0.2,
+            ElementInfo::Radium => 0.1,
         }
     }
 
@@ -129,6 +133,17 @@ impl ElementInfo {
                 .with_children(|parent| {
                     parent.spawn(health);
                 }),
+            ElementInfo::Radium => parent
+                .spawn((
+                    sprite_bundle,
+                    Atom,
+                    Health::new(self.max_health()),
+                    Radium,
+                    shooter,
+                ))
+                .with_children(|parent| {
+                    parent.spawn(health);
+                }),
         };
     }
 }
@@ -144,3 +159,6 @@ pub struct Uranium;
 
 #[derive(Component)]
 pub struct Thorium;
+
+#[derive(Component)]
+pub struct Radium;

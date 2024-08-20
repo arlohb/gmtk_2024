@@ -4,6 +4,7 @@ use crate::{
     camera::{setup_cursor, Cursor},
     enemy::Enemy,
     energy::reset_energy,
+    powerup::Powerup,
     shooting::Bullet,
     timer::death_enter_system,
 };
@@ -18,7 +19,7 @@ pub enum GameState {
 
 pub fn cleanup_system(
     mut cmds: Commands,
-    entities: Query<Entity, Or<(With<Enemy>, With<Bullet>, With<Cursor>)>>,
+    entities: Query<Entity, Or<(With<Enemy>, With<Bullet>, With<Cursor>, With<Powerup>)>>,
     mut windows: Query<&mut Window>,
 ) {
     let Ok(mut window) = windows.get_single_mut() else {

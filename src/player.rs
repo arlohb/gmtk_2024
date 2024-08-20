@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::{
     elements::ElementInfo,
     molecule::{BuildMolecule, Molecule},
+    state::GameState,
     Movement, Velocity,
 };
 
@@ -33,5 +34,5 @@ pub fn create_player(mut cmds: Commands, mut build_molecule_event: EventWriter<B
 }
 
 pub fn plugin(app: &mut App) {
-    app.add_systems(Startup, create_player);
+    app.add_systems(OnEnter(GameState::Playing), create_player);
 }

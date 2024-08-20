@@ -13,6 +13,7 @@ mod shooting;
 mod shop;
 pub use player::Player;
 mod collision;
+mod death;
 mod elements;
 mod enemy;
 mod energy;
@@ -107,6 +108,7 @@ fn main() {
         .add_plugins(powerup::plugin)
         .add_plugins(timer::plugin)
         .add_plugins(state::plugin)
+        .add_plugins(death::plugin)
         .add_systems(Startup, (create_background, setup_music))
         .run();
 }

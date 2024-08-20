@@ -2,11 +2,11 @@ use bevy::prelude::*;
 
 use crate::{
     camera::{setup_cursor, Cursor},
+    death::death_enter_system,
     enemy::Enemy,
     energy::reset_energy,
     powerup::Powerup,
     shooting::Bullet,
-    timer::death_enter_system,
 };
 
 #[derive(States, Debug, Clone, PartialEq, Eq, Hash, Default)]
